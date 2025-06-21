@@ -19,14 +19,25 @@
     line-height: 1.3em;
     max-width: 800px;
     margin: auto;
+    min-height: 400px;
+  }
+  #terminal-output {
+    margin-bottom: 12px;
+  }
+  #terminal-input {
+    display: none;
   }
   .hidden {
     display: none;
   }
-  .input-line {
-    border-bottom: 1px solid white;
-    margin: 8px 0;
-    padding: 4px 8px;
+  input[type="password"], input[type="text"] {
+    background: black;
+    border: 1px solid white;
+    color: white;
+    font-family: inherit;
+    font-size: 1em;
+    padding: 6px 10px;
+    width: 300px;
   }
   button {
     background: none;
@@ -41,28 +52,6 @@
     background: white;
     color: black;
   }
-  input[type="password"], input[type="text"] {
-    background: black;
-    border: 1px solid white;
-    color: white;
-    font-family: inherit;
-    font-size: 1em;
-    padding: 6px 10px;
-    width: 100%;
-    max-width: 300px;
-  }
-  .menu-option {
-    cursor: pointer;
-    color: #ccc;
-  }
-  .menu-option:hover {
-    color: white;
-    text-decoration: underline;
-  }
-  .passcode-dot {
-    font-size: 1.2em;
-    letter-spacing: 3px;
-  }
   a {
     color: #66f;
   }
@@ -70,234 +59,218 @@
 </head>
 <body>
 
-<div id="terminal"></div>
+<div id="terminal">
+  <div id="terminal-output"></div>
+  <div id="terminal-input"></div>
+</div>
 
 <script>
-  // Data for agents and files
+  const terminalOutput = document.getElementById("terminal-output");
+  const terminalInputContainer = document.getElementById("terminal-input");
+
   const agents = {
     "RATCHET": "https://docs.google.com/document/d/19y8PjZXeLRLeM5YRb2OrC5P0a-y_LOkVk4Qapm9vlTI/edit",
     "CHINATSU": "https://docs.google.com/document/u/0/d/1_EHJ-ut4quezxCJSCrMR4vzMZpouqms10R9xtZA5tUY/mobilebasic",
     "AEGIS": "https://docs.google.com/document/d/1u4WypRconLkVQl2Kpyfo_-relGRMSm6kDn3RW5pOSqw/edit",
     "ULGRIN": "https://docs.google.com/document/d/1ihlLNXQDcQJWf-G8_ok3o8gZuD7j6ADwehyaVd29atw/edit",
     "BOBO": "https://docs.google.com/document/d/1Pe9M_jB5Ak95i-uoy9_3GvBNYkqAnEjyPIlboQxP7pE/edit",
-    "CAELUM": "blocked", // restricted, needs passcode
+    "CAELUM": "blocked",
     "BELL": "https://docs.google.com/document/d/1lhK-biGd6koGAMax01xtLYSweqGb8fm4fWI4RyZSdMM/edit",
-    "EAGLE": "https://docs.google.com/document/d/1lhK-biGd6koGAMax01xtLYSweqGb8fm4fWI4RyZSdMM/edit" // example reuse Bell's link for Eagle
+    "EAGLE": "https://docs.google.com/document/d/1lhK-biGd6koGAMax01xtLYSweqGb8fm4fWI4RyZSdMM/edit"
   };
 
-  let terminal = document.getElementById("terminal");
-  let lineIndex = 0;
-  let currentStep = 0;
   let inputCallback = null;
-  let passcode = "123456"; // passcode for blocked files (Caelum)
+  let passcode = "123456";
   let lastSelectedAgent = "";
 
-  // Text lines for initial steps:
-  const lines = [
-    "++SD MANAGEMENT TERMINAL++",
-    "———————————————————",
-    "WARNING:",
-    "YOU ARE ENTERING A RESTRICTED PROGRAM.",
-    "",
-    "PLEASE COMPLETE THE CAPTCHA GIVEN.",
-    "…",
-  ];
-
-  const captchaComplete = [
-    "CAPTCHA COMPLETED.",
-    "",
-    "PLEASE VERIFY AND ENTER YOUR CREDENTIALS.",
-    "…",
-    "STANDBY FOR VERIFICATION…",
-    "…",
-    "USER FOUND..",
-    "CHECKING ACCESS LEVEL..",
-    "…",
-    "ACCESS LEVEL UP TO CODE",
-    "VERIFYING…",
-    "…",
-    "AUTHORIZED. PROCEED.",
-    "———————————————————",
-    "WELCOME.",
-    "",
-    "SELECT CATEGORY",
-    ">PERSONNEL",
-    ">DATABASE",
-    ">DIPLOMACY",
-    ""
-  ];
-
-  const personnelList = [
-    ">RATCHET",
-    ">CHINATSU",
-    ">AEGIS",
-    ">ULGRIN",
-    ">BOBO",
-    ">CAELUM",
-    ">BELL",
-    ">EAGLE",
-    ">NEXT PAGE.."
-  ];
-
-  function printLine(text, delay=50, callback=null) {
-    // Simulate typing line with delay
-    let i = 0;
-    function typeChar() {
-      if (i < text.length) {
-        terminal.innerText += text[i];
-        i++;
-        setTimeout(typeChar, delay);
-      } else {
-        terminal.innerText += "\n";
-        if (callback) callback();
-      }
-    }
-    typeChar();
+  // Helper to append text to terminal output
+  function appendOutput(text = "") {
+    terminalOutput.innerText += text + "\n";
+    terminalOutput.scrollTop = terminalOutput.scrollHeight;
   }
 
-  function printLines(arr, idx = 0, callback=null) {
-    if (idx >= arr.length) {
-      if(callback) callback();
-      return;
-    }
-    printLine(arr[idx], 30, () => printLines(arr, idx+1, callback));
+  // Print lines with delay, returns a Promise to await
+  function printLines(lines, delay=30) {
+    return new Promise(resolve => {
+      let i = 0;
+      function printNext() {
+        if(i < lines.length){
+          appendOutput(lines[i]);
+          i++;
+          setTimeout(printNext, delay);
+        } else {
+          resolve();
+        }
+      }
+      printNext();
+    });
   }
 
   // Clear terminal
   function clearTerminal() {
-    terminal.innerText = "";
+    terminalOutput.innerText = "";
+    terminalInputContainer.innerHTML = "";
+    terminalInputContainer.style.display = "none";
   }
 
-  // Display input prompt and accept user input
-  function promptInput(promptText, callback, isPassword = false) {
-    terminal.innerText += promptText;
-    inputCallback = callback;
-    let inputElement = document.createElement("input");
-    inputElement.type = isPassword ? "password" : "text";
-    inputElement.style.background = "black";
-    inputElement.style.color = "white";
-    inputElement.style.border = "1px solid white";
-    inputElement.style.fontFamily = "'Share Tech Mono', monospace";
-    inputElement.style.fontSize = "1em";
-    inputElement.style.width = "300px";
-    inputElement.autofocus = true;
+  // Show input box with prompt, handle enter key
+  function promptInput(promptText, callback, isPassword=false) {
+    appendOutput(promptText);
+    terminalInputContainer.innerHTML = "";
+    terminalInputContainer.style.display = "block";
+    const input = document.createElement("input");
+    input.type = isPassword ? "password" : "text";
+    input.autofocus = true;
+    terminalInputContainer.appendChild(input);
+    input.focus();
 
-    terminal.appendChild(inputElement);
-    inputElement.focus();
+    function submit() {
+      const val = input.value.trim();
+      if(val === "") return;
+      appendOutput(val);
+      terminalInputContainer.innerHTML = "";
+      terminalInputContainer.style.display = "none";
+      callback(val);
+    }
 
-    inputElement.addEventListener("keydown", e => {
-      if (e.key === "Enter") {
+    input.addEventListener("keydown", e => {
+      if(e.key === "Enter"){
         e.preventDefault();
-        let val = inputElement.value.trim();
-        terminal.removeChild(inputElement);
-        terminal.innerText += val + "\n\n";
-        inputCallback = null;
-        callback(val);
+        submit();
       }
     });
   }
 
-  function wait(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  // Main flow controller
-  async function startTerminal() {
+  async function startTerminal(){
     clearTerminal();
-    await printLines(lines);
+    await printLines([
+      "++SD MANAGEMENT TERMINAL++",
+      "———————————————————",
+      "WARNING:",
+      "YOU ARE ENTERING A RESTRICTED PROGRAM.",
+      "",
+      "PLEASE COMPLETE THE CAPTCHA GIVEN.",
+      "…"
+    ]);
 
-    // Show CAPTCHA "button"
+    // Show CAPTCHA button separately
     const captchaBtn = document.createElement("button");
-    captchaBtn.innerText = "Complete CAPTCHA";
-    terminal.appendChild(captchaBtn);
+    captchaBtn.textContent = "Complete CAPTCHA";
+    terminalInputContainer.appendChild(captchaBtn);
+    terminalInputContainer.style.display = "block";
 
     captchaBtn.onclick = async () => {
-      captchaBtn.remove();
-      terminal.innerText += "\n";
-      await printLines(["…", "…", "…"]);
-      await printLines(captchaComplete);
+      captchaBtn.disabled = true;
+      terminalInputContainer.style.display = "none";
+      appendOutput("\n…");
+      await new Promise(r => setTimeout(r, 600));
+      appendOutput("…");
+      await new Promise(r => setTimeout(r, 600));
+      appendOutput("…");
+      await new Promise(r => setTimeout(r, 600));
 
+      await printLines([
+        "CAPTCHA COMPLETED.",
+        "",
+        "PLEASE VERIFY AND ENTER YOUR CREDENTIALS.",
+        "…",
+        "STANDBY FOR VERIFICATION…",
+        "…",
+        "USER FOUND..",
+        "CHECKING ACCESS LEVEL..",
+        "…",
+        "ACCESS LEVEL UP TO CODE",
+        "VERIFYING…",
+        "…",
+        "AUTHORIZED. PROCEED.",
+        "———————————————————",
+        "WELCOME.",
+        "",
+        "SELECT CATEGORY",
+        ">PERSONNEL",
+        ">DATABASE",
+        ">DIPLOMACY",
+        ""
+      ]);
       showMainMenu();
     };
   }
 
-  // Show main menu (PERSONNEL, DATABASE, DIPLOMACY)
-  function showMainMenu() {
+  // Main menu
+  function showMainMenu(){
     promptInput("> ", (choice) => {
-      const upperChoice = choice.toUpperCase();
-      if (upperChoice === "PERSONNEL") {
+      const c = choice.toUpperCase();
+      if(c === "PERSONNEL") {
         showPersonnelMenu();
-      } else if (upperChoice === "DATABASE") {
-        terminal.innerText += "DATABASE not implemented yet.\n\n";
+      } else if(c === "DATABASE"){
+        appendOutput("DATABASE not implemented yet.\n");
         showMainMenu();
-      } else if (upperChoice === "DIPLOMACY") {
-        terminal.innerText += "DIPLOMACY not implemented yet.\n\n";
+      } else if(c === "DIPLOMACY"){
+        appendOutput("DIPLOMACY not implemented yet.\n");
         showMainMenu();
       } else {
-        terminal.innerText += "INVALID OPTION. TRY AGAIN.\n\n";
+        appendOutput("INVALID OPTION. TRY AGAIN.\n");
         showMainMenu();
       }
     });
   }
 
-  // Show Personnel Menu
-  function showPersonnelMenu() {
+  // Personnel menu
+  function showPersonnelMenu(){
     clearTerminal();
-    terminal.innerText += "PERSONNEL SELECTED\n\nPLEASE SELECT FILE\n";
-    personnelList.forEach(p => terminal.innerText += p + "\n");
-    terminal.innerText += "\n";
+    appendOutput("PERSONNEL SELECTED\n");
+    appendOutput("PLEASE SELECT FILE");
+    Object.keys(agents).forEach(agent => appendOutput(">" + agent));
+    appendOutput(">NEXT PAGE..\n");
 
-    promptInput("> ", (selection) => {
-      const sel = selection.toUpperCase();
-      if (sel === "NEXT PAGE.." || sel === "NEXT PAGE") {
-        terminal.innerText += "\nNO MORE PAGES AVAILABLE.\n\n";
+    promptInput("> ", (sel) => {
+      const selection = sel.toUpperCase();
+      if(selection === "NEXT PAGE.." || selection === "NEXT PAGE"){
+        appendOutput("\nNO MORE PAGES AVAILABLE.\n");
         showPersonnelMenu();
         return;
       }
-      if (agents.hasOwnProperty(sel)) {
-        lastSelectedAgent = sel;
-        if (agents[sel] === "blocked") {
-          // Restricted file: ask for passcode
-          terminal.innerText += "\nERROR: FILE BLOCKED\n\nPLEASE ENTER PASSCODE\n";
-          promptInput("> ", (pass) => {
-            if (pass === passcode) {
-              terminal.innerText += "\nPASSCODE VERIFIED\nACCESS GRANTED\n\n";
-              showAgentFile(sel);
+      if(agents.hasOwnProperty(selection)){
+        lastSelectedAgent = selection;
+        if(agents[selection] === "blocked"){
+          appendOutput("\nERROR: FILE BLOCKED\n");
+          promptInput("PLEASE ENTER PASSCODE\n> ", (pass) => {
+            if(pass === passcode){
+              appendOutput("\nPASSCODE VERIFIED\nACCESS GRANTED\n");
+              showAgentFile(selection);
             } else {
-              terminal.innerText += "\nPASSCODE DENIED\nACCESS DENIED\n\n";
+              appendOutput("\nPASSCODE DENIED\nACCESS DENIED\n");
               showPersonnelMenu();
             }
           }, true);
         } else {
-          // Open file directly
-          showAgentFile(sel);
+          showAgentFile(selection);
         }
       } else {
-        terminal.innerText += "\nINVALID SELECTION. TRY AGAIN.\n\n";
+        appendOutput("\nINVALID SELECTION. TRY AGAIN.\n");
         showPersonnelMenu();
       }
     });
   }
 
-  // Show agent file link or content
-  function showAgentFile(agent) {
+  // Show agent file (link)
+  function showAgentFile(agent){
     clearTerminal();
-    terminal.innerText += `--- ${agent} FILE ---\n\n`;
+    appendOutput(`--- ${agent} FILE ---\n`);
     const link = agents[agent];
-    if (link === "blocked") {
-      terminal.innerText += "[ERROR: FILE STILL BLOCKED]\n\n";
+    if(link === "blocked"){
+      appendOutput("[ERROR: FILE STILL BLOCKED]\n");
       showPersonnelMenu();
       return;
     }
-    terminal.innerHTML += `Document link: <a href="${link}" target="_blank">${link}</a>\n\n`;
-    terminal.innerText += "Press ENTER to return to PERSONNEL MENU.\n\n";
+    appendOutput(`Document link: ${link}\n`);
+    appendOutput("Press ENTER to return to PERSONNEL MENU.\n");
 
     promptInput("> ", () => {
       showPersonnelMenu();
     });
   }
 
-  // Start terminal on load
   window.onload = startTerminal;
 </script>
 

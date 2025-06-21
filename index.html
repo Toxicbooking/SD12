@@ -3,269 +3,251 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>++SD MANAGEMENT TERMINAL++</title>
+<title>Site 64 Security Department Terminal</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-
   body {
     background: black;
     color: white;
     font-family: 'Share Tech Mono', monospace;
+    margin: 0;
     padding: 20px;
-    user-select: none;
   }
-  #terminal {
-    white-space: pre-wrap;
-    line-height: 1.3em;
-    max-width: 800px;
+  header {
+    border-bottom: 1px solid white;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+  }
+  #welcome {
+    margin-bottom: 15px;
+  }
+  nav {
+    margin-bottom: 15px;
+  }
+  nav button {
+    background: none;
+    border: 1px solid white;
+    color: white;
+    font-family: inherit;
+    font-size: 1rem;
+    margin-right: 10px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  nav button:hover {
+    background: white;
+    color: black;
+  }
+  section {
+    max-width: 900px;
     margin: auto;
-    min-height: 400px;
   }
-  #terminal-output {
-    margin-bottom: 12px;
+  h2 {
+    border-bottom: 1px solid white;
+    padding-bottom: 6px;
   }
-  #terminal-input {
-    display: none;
+  a {
+    color: #fff;
+    text-decoration: underline;
   }
-  input[type="password"], input[type="text"], input[type="number"] {
+  a:hover {
+    color: #ccc;
+  }
+  .blocked {
+    color: #f44336;
+    font-style: italic;
+  }
+  label, input {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 1rem;
+  }
+  input[type="text"], input[type="number"] {
     background: black;
     border: 1px solid white;
     color: white;
     font-family: inherit;
-    font-size: 1em;
-    padding: 6px 10px;
-    width: 300px;
+    padding: 6px;
+    width: 200px;
   }
-  button {
-    background: none;
-    border: 1px solid white;
-    color: white;
-    padding: 8px 16px;
-    font-family: inherit;
-    cursor: pointer;
-    margin-top: 12px;
+  button.submit {
+    margin-top: 10px;
   }
-  button:hover {
-    background: white;
-    color: black;
+  #top-info {
+    font-size: 0.9rem;
+    margin-bottom: 15px;
   }
 </style>
 </head>
 <body>
 
-<div id="terminal">
-  <div id="terminal-output"></div>
-  <div id="terminal-input"></div>
-</div>
+<header>
+  <div id="top-info"></div>
+  <div id="welcome">
+    <h1>++Site 64 Security Department Terminal++</h1>
+    <p>The Security Department (SD) is a division of the SCP Foundation, consisting of agents tasked with guarding the Foundation's secret bases and containment facilities. Their job duties include preventing containment breaches (SCPs escaping from the site), keeping D-class personnel under control and forcing them to cooperate in laboratory experiments, and defending the site from external attacks by hostile forces (whether that be an enemy Group of Interest or something more anomalous).</p>
+  </div>
+</header>
+
+<section id="login-section">
+  <h2>Verify Clearance</h2>
+  <form id="login-form">
+    <label for="clearance">Clearance Level (3, 4, or 5):</label>
+    <input type="number" id="clearance" name="clearance" min="1" max="5" required />
+    <label for="codename">Codename:</label>
+    <input type="text" id="codename" name="codename" required />
+    <button type="submit" class="submit">Verify</button>
+  </form>
+  <p id="login-error" style="color:#f44336; display:none;"></p>
+</section>
+
+<nav id="main-menu" style="display:none;">
+  <button data-section="scp">SCPs</button>
+  <button data-section="protocols">Containment Protocols</button>
+  <button data-section="personnel">SD Personnel</button>
+  <button data-section="sd-lore">SD Lore</button>
+</nav>
+
+<section id="content" style="max-width:900px; margin:auto;"></section>
 
 <script>
-  const terminalOutput = document.getElementById("terminal-output");
-  const terminalInputContainer = document.getElementById("terminal-input");
+  const loginForm = document.getElementById("login-form");
+  const loginError = document.getElementById("login-error");
+  const loginSection = document.getElementById("login-section");
+  const mainMenu = document.getElementById("main-menu");
+  const content = document.getElementById("content");
+  const topInfo = document.getElementById("top-info");
 
-  const agents = {
-    "RATCHET": "https://docs.google.com/document/d/19y8PjZXeLRLeM5YRb2OrC5P0a-y_LOkVk4Qapm9vlTI/edit",
-    "CHINATSU": "https://docs.google.com/document/u/0/d/1_EHJ-ut4quezxCJSCrMR4vzMZpouqms10R9xtZA5tUY/mobilebasic",
-    "AEGIS": "https://docs.google.com/document/d/1u4WypRconLkVQl2Kpyfo_-relGRMSm6kDn3RW5pOSqw/edit",
-    "ULGRIN": "https://docs.google.com/document/d/1ihlLNXQDcQJWf-G8_ok3o8gZuD7j6ADwehyaVd29atw/edit",
-    "BOBO": "https://docs.google.com/document/d/1Pe9M_jB5Ak95i-uoy9_3GvBNYkqAnEjyPIlboQxP7pE/edit",
-    "CAELUM": "blocked",
-    "BELL": "https://docs.google.com/document/d/1lhK-biGd6koGAMax01xtLYSweqGb8fm4fWI4RyZSdMM/edit",
-    "EAGLE": "https://docs.google.com/document/d/1lhK-biGd6koGAMax01xtLYSweqGb8fm4fWI4RyZSdMM/edit"
-  };
-
-  let inputCallback = null;
-  let passcode = "123456";
-  let lastSelectedAgent = "";
   let clearanceLevel = 0;
   let codename = "";
 
-  function appendOutput(text = "") {
-    terminalOutput.innerText += text + "\n";
-    terminalOutput.scrollTop = terminalOutput.scrollHeight;
-  }
+  // Agent data
+  const agents = {
+    "Ratchet": "https://docs.google.com/document/d/19y8PjZXeLRLeM5YRb2OrC5P0a-y_LOkVk4Qapm9vlTI/edit?usp=sharing",
+    "Black Dawn": "https://docs.google.com/document/u/0/d/1_EHJ-ut4quezxCJSCrMR4vzMZpouqms10R9xtZA5tUY/mobilebasic",
+    "Caelum": "blocked",
+    "Forge": "https://docs.google.com/document/d/1ihlLNXQDcQJWf-G8_ok3o8gZuD7j6ADwehyaVd29atw/edit?usp=sharing",
+    "Bell": "https://docs.google.com/document/d/1Pe9M_jB5Ak95i-uoy9_3GvBNYkqAnEjyPIlboQxP7pE/edit?usp=sharing",
+    "Toxic": "https://docs.google.com/document/d/1lhK-biGd6koGAMax01xtLYSweqGb8fm4fWI4RyZSdMM/edit?usp=sharing"
+  };
 
-  function printLines(lines, delay=30) {
-    return new Promise(resolve => {
-      let i = 0;
-      function printNext() {
-        if(i < lines.length){
-          appendOutput(lines[i]);
-          i++;
-          setTimeout(printNext, delay);
-        } else {
-          resolve();
-        }
-      }
-      printNext();
-    });
-  }
-
-  function clearTerminal() {
-    terminalOutput.innerText = "";
-    terminalInputContainer.innerHTML = "";
-    terminalInputContainer.style.display = "none";
-  }
-
-  function promptInput(promptText, callback, isPassword=false, inputType="text") {
-    appendOutput(promptText);
-    terminalInputContainer.innerHTML = "";
-    terminalInputContainer.style.display = "block";
-    const input = document.createElement("input");
-    input.type = isPassword ? "password" : inputType;
-    input.autofocus = true;
-    terminalInputContainer.appendChild(input);
-    input.focus();
-
-    function submit() {
-      const val = input.value.trim();
-      if(val === "") return;
-      appendOutput(val);
-      terminalInputContainer.innerHTML = "";
-      terminalInputContainer.style.display = "none";
-      callback(val);
+  // SCP data (simplified summaries)
+  const scps = {
+    "SCP-099": {
+      strengths: "Possesses the ability to create vivid hallucinations; difficult to physically contain.",
+      weaknesses: "Affected by psychological containment and isolation protocols.",
+      containment: "Must be confined in a soundproof chamber with no visual contact."
+    },
+    "SCP-173": {
+      strengths: "Extremely fast and lethal when unobserved.",
+      weaknesses: "Cannot move while in direct line of sight.",
+      containment: "Keep in a locked container. Constant observation by at least 3 personnel."
+    },
+    "SCP-096": {
+      strengths: "Becomes violently aggressive when viewed directly.",
+      weaknesses: "Avoid any direct eye contact or video recording.",
+      containment: "Secure containment area with no cameras or personnel allowed to view face."
+    },
+    "SCP-457": {
+      strengths: "Flame entity, able to incinerate objects.",
+      weaknesses: "Can be suppressed by water or fire retardants.",
+      containment: "Containment cell with fireproof walls and continuous water spray."
     }
+  };
 
-    input.addEventListener("keydown", e => {
-      if(e.key === "Enter"){
-        e.preventDefault();
-        submit();
-      }
-    });
+  // Containment Protocols improved sample
+  const protocols = `
+    <h2>Containment Protocols</h2>
+    <p>The Security Department enforces strict containment protocols to ensure SCPs remain secured and personnel safety is maintained.</p>
+    <ul>
+      <li><strong>Observation:</strong> SCPs must be monitored 24/7 via direct or remote surveillance, with at least two personnel always on duty.</li>
+      <li><strong>Access Control:</strong> Only personnel with appropriate clearance levels can access SCP containment areas.</li>
+      <li><strong>Emergency Response:</strong> In case of containment breach, lockdown procedures are to be initiated immediately, including site-wide alerts and mobilization of Mobile Task Forces.</li>
+      <li><strong>D-Class Handling:</strong> D-class personnel must be controlled at all times to prevent sabotage or escape attempts.</li>
+      <li><strong>External Threats:</strong> Defense protocols are in place to repel attacks from hostile Groups of Interest or anomalous threats.</li>
+      <li><strong>Communication:</strong> All incidents and protocol breaches must be logged and reported to Site Command immediately.</li>
+    </ul>
+  `;
+
+  // SD Lore text (updated per your instructions)
+  const sdLore = `
+    <h2>Security Department Lore</h2>
+    <p>The Security Department (SD) is a division of the SCP Foundation, consisting of agents tasked with guarding the Foundation's secret bases and containment facilities.</p>
+    <p>Their job duties include preventing containment breaches (SCPs escaping from the site), keeping D-class personnel under control and forcing them to cooperate in laboratory experiments, and defending the site from external attacks by hostile forces (whether that be an enemy Group of Interest or something more anomalous).</p>
+  `;
+
+  function updateTopInfo(){
+    topInfo.textContent = `Clearance Level: ${clearanceLevel} | Codename: ${codename}`;
   }
 
-  async function startTerminal(){
-    clearTerminal();
-    await printLines([
-      "++SD MANAGEMENT TERMINAL++",
-      "———————————————————",
-      "WARNING:",
-      "YOU ARE ENTERING A RESTRICTED PROGRAM.",
-      "",
-      "PLEASE SELECT CATEGORY",
-      ">PERSONNEL",
-      ">DATABASE",
-      ">DIPLOMACY",
-      ""
-    ]);
-    showMainMenu();
-  }
-
-  function showMainMenu(){
-    promptInput("> ", (choice) => {
-      const c = choice.toUpperCase();
-      if(c === "PERSONNEL") {
-        verifyPersonnel();
-      } else if(c === "DATABASE"){
-        appendOutput("DATABASE not implemented yet.\n");
-        showMainMenu();
-      } else if(c === "DIPLOMACY"){
-        appendOutput("DIPLOMACY not implemented yet.\n");
-        showMainMenu();
-      } else {
-        appendOutput("INVALID OPTION. TRY AGAIN.\n");
-        showMainMenu();
-      }
-    });
-  }
-
-  // New simple verification before Personnel access
-  function verifyPersonnel(){
-    clearTerminal();
-    appendOutput("PERSONNEL SELECTED\n");
-    promptInput("ENTER CLEARANCE LEVEL (3, 4, 5):", (level) => {
-      const lvl = Number(level);
-      if([3,4,5].includes(lvl)){
-        clearanceLevel = lvl;
-        promptInput("ENTER CODENAME:", (name) => {
-          codename = name.toUpperCase();
-          clearTerminal();
-          appendOutput(`CLEARANCE LEVEL: ${clearanceLevel} | CODENAME: ${codename}\n`);
-          showPersonnelMenu();
-        });
-      } else {
-        appendOutput("\nACCESS DENIED: INVALID CLEARANCE LEVEL.\n");
-        setTimeout(() => {
-          startTerminal();
-        }, 1500);
-      }
-    }, false, "number");
-  }
-
-  function showPersonnelMenu(){
-    clearTerminal();
-    appendOutput(`CLEARANCE LEVEL: ${clearanceLevel} | CODENAME: ${codename}\n`);
-    appendOutput("PLEASE SELECT FILE");
-    Object.keys(agents).forEach(agent => {
-      if(agent === "CAELUM" && clearanceLevel < 5){
-        appendOutput(">" + "CLASSIFIED");
-      } else {
-        appendOutput(">" + agent);
-      }
-    });
-    appendOutput(">NEXT PAGE..\n");
-
-    promptInput("> ", (sel) => {
-      let selection = sel.toUpperCase();
-      if(selection === "NEXT PAGE.." || selection === "NEXT PAGE"){
-        appendOutput("\nNO MORE PAGES AVAILABLE.\n");
-        showPersonnelMenu();
-        return;
-      }
-
-      // For censored names if clearance <5
-      if(clearanceLevel < 5 && selection === "CLASSIFIED"){
-        appendOutput("\nACCESS DENIED: CLEARANCE LEVEL TOO LOW.\n");
-        showPersonnelMenu();
-        return;
-      }
-
-      // Map back CLASSIFIED to CAELUM if clearance allows
-      if(selection === "CLASSIFIED"){
-        selection = "CAELUM";
-      }
-
-      if(agents.hasOwnProperty(selection)){
-        lastSelectedAgent = selection;
-        if(agents[selection] === "blocked"){
-          appendOutput("\nERROR: FILE BLOCKED\n");
-          promptInput("PLEASE ENTER PASSCODE\n> ", (pass) => {
-            if(pass === passcode){
-              appendOutput("\nPASSCODE VERIFIED\nACCESS GRANTED\n");
-              showAgentFile(selection);
-            } else {
-              appendOutput("\nPASSCODE DENIED\nACCESS DENIED\n");
-              showPersonnelMenu();
-            }
-          }, true);
-        } else {
-          showAgentFile(selection);
-        }
-      } else {
-        appendOutput("\nINVALID SELECTION. TRY AGAIN.\n");
-        showPersonnelMenu();
-      }
-    });
-  }
-
-  function showAgentFile(agent){
-    clearTerminal();
-    appendOutput(`CLEARANCE LEVEL: ${clearanceLevel} | CODENAME: ${codename}\n`);
-    appendOutput(`--- ${agent} FILE ---\n`);
-    const link = agents[agent];
-    if(link === "blocked"){
-      appendOutput("[ERROR: FILE STILL BLOCKED]\n");
-      showPersonnelMenu();
+  loginForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const level = Number(document.getElementById("clearance").value);
+    const name = document.getElementById("codename").value.trim();
+    if (![3,4,5].includes(level)) {
+      loginError.textContent = "Access Denied: Clearance level must be 3, 4, or 5.";
+      loginError.style.display = "block";
       return;
     }
-    appendOutput(`Document link: ${link}\n`);
-    appendOutput("Press ENTER to return to PERSONNEL MENU.\n");
+    if (name === "") {
+      loginError.textContent = "Please enter a valid codename.";
+      loginError.style.display = "block";
+      return;
+    }
+    clearanceLevel = level;
+    codename = name.toUpperCase();
+    loginError.style.display = "none";
+    loginSection.style.display = "none";
+    mainMenu.style.display = "block";
+    updateTopInfo();
+    showSection("scp");
+  });
 
-    promptInput("> ", () => {
-      showPersonnelMenu();
-    });
+  mainMenu.addEventListener("click", e => {
+    if (e.target.tagName === "BUTTON"){
+      const section = e.target.getAttribute("data-section");
+      showSection(section);
+    }
+  });
+
+  function showSection(section) {
+    if (section === "scp"){
+      showSCPs();
+    } else if (section === "protocols"){
+      content.innerHTML = protocols;
+    } else if (section === "personnel"){
+      showPersonnel();
+    } else if (section === "sd-lore"){
+      content.innerHTML = sdLore;
+    }
   }
 
-  window.onload = startTerminal;
+  function showSCPs(){
+    let html = "<h2>Secure Containment Procedures</h2>";
+    for(const [scp, data] of Object.entries(scps)){
+      html += `<h3>${scp}</h3>
+      <p><strong>Strengths:</strong> ${data.strengths}</p>
+      <p><strong>Weaknesses:</strong> ${data.weaknesses}</p>
+      <p><strong>Containment Procedures:</strong> ${data.containment}</p>
+      <hr>`;
+    }
+    content.innerHTML = html;
+  }
+
+  function showPersonnel(){
+    let html = "<h2>SD Personnel</h2><ul>";
+    for(const [name, link] of Object.entries(agents)){
+      if (link === "blocked" && clearanceLevel < 5){
+        html += `<li>${name}: <span class="blocked">FILE CLASSIFIED</span></li>`;
+      } else if (link === "blocked"){
+        html += `<li>${name}: <span class="blocked">FILE BLOCKED</span></li>`;
+      } else {
+        html += `<li><a href="${link}" target="_blank" rel="noopener noreferrer">${name}</a></li>`;
+      }
+    }
+    html += "</ul>";
+    content.innerHTML = html;
+  }
 </script>
 
 </body>

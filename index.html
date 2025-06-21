@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SCP Site-64 Security Department</title>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      background-color: #111;
+      color: #0f0;
+      margin: 0;
+      padding: 0;
+    }
+    header, nav, section {
+      padding: 20px;
+    }
+    #clearance-page, #main-site {
+      display: none;
+    }
+    .active {
+      display: block;
+    }
+    input, button {
+      font-family: inherit;
+      padding: 10px;
+      margin-top: 10px;
+      background-color: #222;
+      border: 1px solid #0f0;
+      color: #0f0;
+    }
+    nav button {
+      margin-right: 10px;
+    }
+    .content-section {
+      display: none;
+    }
+    .content-section.active {
+      display: block;
+    }
+    hr {
+      border-color: #0f0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Clearance Verification -->
+<div id="clearance-page" class="active">
+  <header>
+    <h1>Welcome to SCP Site-64</h1>
+    <p>Security Clearance Required</p>
+  </header>
+  <section>
+    <label for="clearance">Enter Security Clearance Level:</label><br />
+    <input type="text" id="clearance" placeholder="e.g., Level 4" />
+    <button onclick="verifyClearance()">Verify</button>
+    <p id="error" style="color:red;"></p>
+  </section>
+</div>
+
+<!-- Main Site Content -->
+<div id="main-site">
+  <header>
+    <h1>SCP Site-64 Security Department</h1>
+    <hr />
+  </header>
+
+  <nav>
+    <button onclick="showSection('scps')">SCPs</button>
+    <button onclick="showSection('protocols')">Containment Protocols</button>
+    <button onclick="showSection('lore')">Site Lore</button>
+    <button onclick="showSection('emergency')">Emergency Protocols</button>
+  </nav>
+
+  <section id="scps" class="content-section active">
+    <h2>SCP Files</h2>
+    <p><strong>SCP-███</strong>: [Redacted] – Euclid Class.</p>
+    <p><strong>SCP-1981</strong>: “Ronald Reagan Cut Up While Talking.”</p>
+    <p><strong>SCP-3008</strong>: IKEA Infinite – Subject remains under lockdown.</p>
+  </section>
+
+  <section id="protocols" class="content-section">
+    <h2>Containment Protocols</h2>
+    <p>All SCPs are to be housed in secure chambers with reinforced material and biometric locks.</p>
+    <p>Unauthorized personnel attempting access will be detained and interrogated.</p>
+  </section>
+
+  <section id="lore" class="content-section">
+    <h2>Site-64 Lore & History</h2>
+    <p>Site-64 was established in Portland, Oregon as a mid-level containment and research facility.</p>
+    <p>Initial operations began in ████ after the discovery of anomalous artifacts in the region.</p>
+    <p>Currently staffed by ██ researchers and ██ armed personnel.</p>
+  </section>
+
+  <section id="emergency" class="content-section">
+    <h2>Emergency Protocols</h2>
+    <p>Code Black: Total breach. Initiate site lockdown. Evacuation prohibited.</p>
+    <p>Code Orange: Minor containment failure. Deploy MTF units.</p>
+    <p>Code Green: Drill or false alarm. Resume normal operations.</p>
+  </section>
+</div>
+
+<script>
+  function verifyClearance() {
+    const level = document.getElementById("clearance").value.trim().toLowerCase();
+    const allowed = ["level 4", "4", "admin", "o5"];
+    if (allowed.includes(level)) {
+      document.getElementById("clearance-page").classList.remove("active");
+      document.getElementById("main-site").classList.add("active");
+    } else {
+      document.getElementById("error").innerText = "ACCESS DENIED: Insufficient clearance.";
+    }
+  }
+
+  function showSection(id) {
+    const sections = document.querySelectorAll(".content-section");
+    sections.forEach(section => section.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  }
+</script>
+
+</body>
+</html>

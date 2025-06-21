@@ -1,107 +1,118 @@
+<!-- Updated SD Terminal HTML -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>SD Database Terminal</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-  body {
-    background: black;
-    color: white;
-    font-family: 'Share Tech Mono', monospace;
-    margin: 0; padding: 20px;
-  }
-  header {
-    border-bottom: 1px solid white;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
-  }
-  #top-info {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
-  nav {
-    margin-bottom: 15px;
-  }
-  nav button {
-    background: none;
-    border: 1px solid white;
-    color: white;
-    font-family: inherit;
-    font-size: 1rem;
-    margin-right: 10px;
-    padding: 8px 16px;
-    cursor: pointer;
-  }
-  nav button:hover {
-    background: white;
-    color: black;
-  }
-  section {
-    max-width: 900px;
-    margin: auto;
-  }
-  h2 {
-    border-bottom: 1px solid white;
-    padding-bottom: 6px;
-  }
-  .access-denied {
-    color: #f44336;
-    font-weight: bold;
-    font-size: 1.2rem;
-    margin-top: 20px;
-  }
-  .redacted {
-    background: white;
-    color: white;
-    border-radius: 2px;
-    padding: 0 4px;
-    user-select: none;
-  }
-  label, input {
-    display: block;
-    margin-bottom: 10px;
-    font-size: 1rem;
-  }
-  input[type="text"] {
-    background: black;
-    border: 1px solid white;
-    color: white;
-    font-family: inherit;
-    padding: 6px;
-    width: 200px;
-    box-sizing: border-box;
-    text-transform: uppercase;
-  }
-  button.submit {
-    margin-top: 10px;
-  }
-  #login-error {
-    color: #f44336;
-    margin-top: 10px;
-    font-weight: bold;
-    display: none;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SD Database Terminal</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+    body {
+      background: black;
+      color: white;
+      font-family: 'Share Tech Mono', monospace;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      text-align: center;
+      padding: 40px 20px 20px;
+    }
+    #top-info {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    #login-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 70vh;
+    }
+    #login-section h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+    label, input {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+    input[type="text"] {
+      background: black;
+      border: 1px solid white;
+      color: white;
+      padding: 6px;
+      width: 220px;
+      text-transform: uppercase;
+    }
+    button {
+      background: none;
+      border: 1px solid white;
+      color: white;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: white;
+      color: black;
+    }
+    #login-error {
+      color: red;
+      margin-top: 10px;
+      display: none;
+    }
+    nav {
+      text-align: center;
+      margin-top: 20px;
+    }
+    nav button {
+      margin: 0 10px;
+    }
+    section#content {
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+    h2 {
+      border-bottom: 1px solid white;
+      padding-bottom: 6px;
+    }
+    a {
+      color: lightblue;
+      text-decoration: underline;
+    }
+    .access-denied {
+      color: #f44336;
+      font-weight: bold;
+    }
+    .redacted {
+      background: white;
+      color: white;
+      border-radius: 2px;
+      padding: 0 4px;
+      user-select: none;
+    }
+  </style>
 </head>
 <body>
 
 <header>
-  <div id="top-info">SD Database</div>
+  <div id="top-info">SD DATABASE</div>
 </header>
 
 <section id="login-section">
   <h2>Verify Clearance</h2>
   <form id="login-form">
     <label for="clearance">Clearance Level (3, 4, or 5):</label>
-    <input type="text" id="clearance" name="clearance" autocomplete="off" maxlength="1" required placeholder="3, 4 or 5"/>
+    <input type="text" id="clearance" maxlength="1" placeholder="3, 4, or 5" required />
     <label for="codename">Codename:</label>
-    <input type="text" id="codename" name="codename" autocomplete="off" required maxlength="20" />
-    <button type="submit" class="submit">Verify</button>
+    <input type="text" id="codename" maxlength="20" required />
+    <button type="submit">Verify</button>
+    <p id="login-error"></p>
   </form>
-  <p id="login-error"></p>
 </section>
 
 <nav id="main-menu" style="display:none;">
@@ -125,176 +136,40 @@
   let clearanceLevel = 0;
   let codename = "";
 
-  // SCP Data
-  const scps = {
-    "SCP-099": {
-      strengths: "Possesses the ability to create vivid hallucinations; difficult to physically contain.",
-      weaknesses: "Affected by psychological containment and isolation protocols.",
-      containment: "Must be confined in a soundproof chamber with no visual contact."
-    },
-    "SCP-173": {
-      strengths: "Extremely fast and lethal when unobserved.",
-      weaknesses: "Cannot move while in direct line of sight.",
-      containment: "Keep in a locked container. Constant observation by at least 3 personnel."
-    },
-    "SCP-096": {
-      strengths: "Becomes violently aggressive when viewed directly.",
-      weaknesses: "Avoid any direct eye contact or video recording.",
-      containment: "Secure containment area with no cameras or personnel allowed to view face."
-    },
-    "SCP-457": {
-      strengths: "Flame entity, able to incinerate objects.",
-      weaknesses: "Can be suppressed by water or fire retardants.",
-      containment: "Containment cell with fireproof walls and continuous water spray."
-    }
+  const personnelLinks = {
+    "Ratchet": "https://docs.google.com/document/d/19y8PjZXeLRLeM5YRb2OrC5P0a-y_LOkVk4Qapm9vlTI/edit",
+    "Black Dawn": "https://docs.google.com/document/d/1_EHJ-ut4quezxCJSCrMR4vzMZpouqms10R9xtZA5tUY/edit",
+    "Caelum": "https://docs.google.com/document/d/1u4WypRconLkVQl2Kpyfo_-relGRMSm6kDn3RW5pOSqw/edit",
+    "Forge": "https://docs.google.com/document/d/1ihlLNXQDcQJWf-G8_ok3o8gZuD7j6ADwehyaVd29atw/edit",
+    "Bell": "https://docs.google.com/document/d/1Pe9M_jB5Ak95i-uoy9_3GvBNYkqAnEjyPIlboQxP7pE/edit",
+    "Toxic": "https://docs.google.com/document/d/1lhK-biGd6koGAMax01xtLYSweqGb8fm4fWI4RyZSdMM/edit",
+    "Chinatsu": "https://docs.google.com/document/d/1TNidYCG7qQ5wLJbqSQqMU0RDAHTgP7LvIxFIUXUkkBs/edit",
+    "Aegis": "https://docs.google.com/document/d/1fNKU8Zk5LhS8fIYzQXKME80eI3Rm7agee9KIYOEhDys/edit",
+    "Ulgrin": "https://docs.google.com/document/d/1dQwQMj6c8bjreWdlK2y7C0zg1Obf8Iz-kL1O-ogw22g/edit",
+    "BOBO": "https://docs.google.com/document/d/1kTlLTzDJTNJwjrM8HNwYj5ym-vBFG6UuvwwIt09Sc88/edit",
+    "Ziomal": "https://docs.google.com/document/d/1WhzA9yJcVwNOW5aa2QeH5dAn48IRxm2XuD_-1Q83V-4/edit",
+    "Chrashium": "https://docs.google.com/document/d/1ux5b5K16cTIQWliSNCwoCO4HraCqr7CdW3TiUO2PPf8/edit",
+    "Trooper": "https://docs.google.com/document/d/1D4edfHHDRQGbtG2PHP26tiD9lmGliEpnXdhhs3Vbuqg/edit"
   };
-
-  const protocols = `
-    <h2>Containment Protocols</h2>
-    <p>The Security Department enforces strict containment protocols to ensure SCPs remain secured and personnel safety is maintained.</p>
-    <ul>
-      <li><strong>Observation:</strong> SCPs must be monitored 24/7 via direct or remote surveillance, with at least two personnel always on duty.</li>
-      <li><strong>Access Control:</strong> Only personnel with appropriate clearance levels can access SCP containment areas.</li>
-      <li><strong>Emergency Response:</strong> In case of containment breach, lockdown procedures are to be initiated immediately, including site-wide alerts and mobilization of Mobile Task Forces.</li>
-      <li><strong>D-Class Handling:</strong> D-class personnel must be controlled at all times to prevent sabotage or escape attempts.</li>
-      <li><strong>External Threats:</strong> Defense protocols are in place to repel attacks from hostile Groups of Interest or anomalous threats.</li>
-      <li><strong>Communication:</strong> All incidents and protocol breaches must be logged and reported to Site Command immediately.</li>
-    </ul>
-  `;
-
-  const sdLore = `
-    <h2>Security Department Lore</h2>
-    <p>The Security Department (SD) is a division of the SCP Foundation, consisting of agents tasked with guarding the Foundation's secret bases and containment facilities.</p>
-    <p>Their job duties include preventing containment breaches, keeping D-class personnel under control, and defending the site from external attacks by hostile forces.</p>
-  `;
-
-  const sdTeamsData = {
-    charlie: {
-      name: "Team Charlie",
-      description: "Responsible for CDC (Containment and Decontamination Control) and LCZ (Low Containment Zone) work, handling low-risk SCP containment and site sanitation."
-    },
-    quebec: {
-      name: "Team Quebec",
-      description: "Operates checkpoints and patrols in the MCZ (Medium Containment Zone) and HCZ (High Containment Zone), maintaining security within these critical containment areas."
-    },
-    xray: {
-      name: "Team Xray",
-      description: "Guards the AD (Administrative) checkpoint and provides security for VIP personnel within the facility."
-    },
-    hotel: {
-      name: "Team Hotel",
-      description: "An elite unit overseeing advanced security operations and rapid response within the facility."
-    },
-    stfo: {
-      name: "STFO <span class='redacted'>████</span> \"Elite Enforcers\"",
-      description: `STFO is a specialized task force within the Security Department, known for exceptional PvP skills and rapid tactical response. They are classified as <span class="redacted">████</span>-1, representing one of the most formidable units in the department, operating under strict confidentiality.`
-    }
-  };
-
-  // Update header top-info with clearance and codename after login
-  function updateTopInfo() {
-    topInfo.textContent = `Clearance Level: ${clearanceLevel} | Codename: ${codename}`;
-  }
 
   loginForm.addEventListener("submit", e => {
     e.preventDefault();
-    const levelInput = document.getElementById("clearance").value.trim();
-    const nameInput = document.getElementById("codename").value.trim();
-    if (!["3", "4", "5"].includes(levelInput)) {
-      loginError.textContent = "Access Denied: Clearance level must be 3, 4, or 5.";
+    const level = document.getElementById("clearance").value.trim();
+    const name = document.getElementById("codename").value.trim();
+
+    if (!["3", "4", "5"].includes(level)) {
+      loginError.textContent = "Invalid Clearance. Must be 3, 4, or 5.";
       loginError.style.display = "block";
       return;
     }
-    if (nameInput === "") {
-      loginError.textContent = "Please enter a valid codename.";
-      loginError.style.display = "block";
-      return;
-    }
-    clearanceLevel = Number(levelInput);
-    codename = nameInput.toUpperCase();
-    loginError.style.display = "none";
+
+    clearanceLevel = parseInt(level);
+    codename = name.toUpperCase();
+    topInfo.textContent = `Clearance Level: ${clearanceLevel} | Codename: ${codename}`;
     loginSection.style.display = "none";
     mainMenu.style.display = "block";
-    updateTopInfo();
-    showSection("scp");
+    content.innerHTML = "";
   });
-
-  mainMenu.addEventListener("click", e => {
-    if (e.target.tagName === "BUTTON") {
-      const section = e.target.getAttribute("data-section");
-      showSection(section);
-    }
-  });
-
-  function showSection(section) {
-    if (section === "scp") {
-      showSCPs();
-    } else if (section === "protocols") {
-      content.innerHTML = protocols;
-    } else if (section === "personnel") {
-      showPersonnel();
-    } else if (section === "sd-lore") {
-      content.innerHTML = sdLore;
-    } else if (section === "teams") {
-      showTeams();
-    }
-  }
-
-  function showSCPs() {
-    let html = "<h2>Secure Containment Procedures</h2><ul>";
-    for (const scp in scps) {
-      html += `<li><strong>${scp}</strong>:<br>Strengths: ${scps[scp].strengths}<br>Weaknesses: ${scps[scp].weaknesses}<br>Containment: ${scps[scp].containment}</li><br>`;
-    }
-    html += "</ul>";
-    content.innerHTML = html;
-  }
-
-  function showPersonnel() {
-    if (clearanceLevel < 4) {
-      content.innerHTML = `<p class="access-denied">ACCESS DENIED: Personnel records require L4 or higher clearance.</p>`;
-      return;
-    }
-    // Show personnel info but no classified documents
-    content.innerHTML = `
-      <h2>SD Personnel</h2>
-      <ul>
-        <li>Ratchet</li>
-        <li>Black Dawn</li>
-        <li>Caelum</li>
-        <li>Forge</li>
-        <li>Bell</li>
-        <li>Toxic</li>
-      </ul>
-      <p><em>Documents classified and not displayed.</em></p>
-    `;
-  }
-
-  function showTeams() {
-    let html = "<h2>Security Department Teams</h2>";
-
-    // L3+ teams: Charlie, Quebec, Xray
-    if (clearanceLevel >= 3) {
-      html += `<h3>Teams (L3+ clearance)</h3><ul>`;
-      html += `<li><strong>${sdTeamsData.charlie.name}</strong>: ${sdTeamsData.charlie.description}</li>`;
-      html += `<li><strong>${sdTeamsData.quebec.name}</strong>: ${sdTeamsData.quebec.description}</li>`;
-      html += `<li><strong>${sdTeamsData.xray.name}</strong>: ${sdTeamsData.xray.description}</li>`;
-      html += `</ul>`;
-    }
-
-    // L4+ team: Hotel
-    if (clearanceLevel >= 4) {
-      html += `<h3>Team Hotel (L4+ clearance)</h3>`;
-      html += `<p>${sdTeamsData.hotel.description}</p>`;
-    }
-
-    // L5+ team: STFO
-    if (clearanceLevel >= 5) {
-      html += `<h3>STFO "Elite Enforcers" (L5+ clearance)</h3>`;
-      html += `<p>${sdTeamsData.stfo.description}</p>`;
-    }
-
-    content.innerHTML = html;
-  }
 </script>
 
 </body>

@@ -10,15 +10,15 @@
     background: black;
     color: white;
     font-family: 'Share Tech Mono', monospace;
-    margin: 0;
-    padding: 20px;
+    margin: 0; padding: 20px;
   }
   header {
     border-bottom: 1px solid white;
     padding-bottom: 10px;
     margin-bottom: 15px;
   }
-  #welcome {
+  #top-info {
+    font-size: 0.9rem;
     margin-bottom: 15px;
   }
   nav {
@@ -53,31 +53,6 @@
   a:hover {
     color: #ccc;
   }
-  .blocked {
-    color: #f44336;
-    font-style: italic;
-  }
-  label, input {
-    display: block;
-    margin-bottom: 10px;
-    font-size: 1rem;
-  }
-  input[type="text"], input[type="number"] {
-    background: black;
-    border: 1px solid white;
-    color: white;
-    font-family: inherit;
-    padding: 6px;
-    width: 200px;
-    box-sizing: border-box;
-  }
-  button.submit {
-    margin-top: 10px;
-  }
-  #top-info {
-    font-size: 0.9rem;
-    margin-bottom: 15px;
-  }
   .access-denied {
     color: #f44336;
     font-weight: bold;
@@ -91,8 +66,22 @@
     padding: 0 4px;
     user-select: none;
   }
-  ul {
-    padding-left: 20px;
+  label, input {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 1rem;
+  }
+  input[type="text"] {
+    background: black;
+    border: 1px solid white;
+    color: white;
+    font-family: inherit;
+    padding: 6px;
+    width: 200px;
+    box-sizing: border-box;
+  }
+  button.submit {
+    margin-top: 10px;
   }
 </style>
 </head>
@@ -110,7 +99,7 @@
   <h2>Verify Clearance</h2>
   <form id="login-form">
     <label for="clearance">Clearance Level (3, 4, or 5):</label>
-    <input type="number" id="clearance" name="clearance" min="3" max="5" required />
+    <input type="text" id="clearance" name="clearance" autocomplete="off" maxlength="1" required placeholder="Enter 3, 4 or 5"/>
     <label for="codename">Codename:</label>
     <input type="text" id="codename" name="codename" autocomplete="off" required maxlength="20" />
     <button type="submit" class="submit">Verify</button>
@@ -126,7 +115,7 @@
   <button data-section="teams">SD Teams</button>
 </nav>
 
-<section id="content" style="max-width:900px; margin:auto;"></section>
+<section id="content"></section>
 
 <script>
   const loginForm = document.getElementById("login-form");
@@ -139,7 +128,6 @@
   let clearanceLevel = 0;
   let codename = "";
 
-  // Agent data
   const agents = {
     "Ratchet": "https://docs.google.com/document/d/19y8PjZXeLRLeM5YRb2OrC5P0a-y_LOkVk4Qapm9vlTI/edit?usp=sharing",
     "Black Dawn": "https://docs.google.com/document/u/0/d/1_EHJ-ut4quezxCJSCrMR4vzMZpouqms10R9xtZA5tUY/mobilebasic",
@@ -149,7 +137,6 @@
     "Toxic": "https://docs.google.com/document/d/1lhK-biGd6koGAMax01xtLYSweqGb8fm4fWI4RyZSdMM/edit?usp=sharing"
   };
 
-  // SCP data (simplified summaries)
   const scps = {
     "SCP-099": {
       strengths: "Possesses the ability to create vivid hallucinations; difficult to physically contain.",
@@ -173,7 +160,6 @@
     }
   };
 
-  // Containment Protocols improved sample
   const protocols = `
     <h2>Containment Protocols</h2>
     <p>The Security Department enforces strict containment protocols to ensure SCPs remain secured and personnel safety is maintained.</p>
@@ -187,14 +173,12 @@
     </ul>
   `;
 
-  // SD Lore text (updated per your instructions)
   const sdLore = `
     <h2>Security Department Lore</h2>
     <p>The Security Department (SD) is a division of the SCP Foundation, consisting of agents tasked with guarding the Foundation's secret bases and containment facilities.</p>
     <p>Their job duties include preventing containment breaches (SCPs escaping from the site), keeping D-class personnel under control and forcing them to cooperate in laboratory experiments, and defending the site from external attacks by hostile forces (whether that be an enemy Group of Interest or something more anomalous).</p>
   `;
 
-  // SD Teams descriptions
   const sdTeamsData = {
     charlie: {
       name: "Team Charlie",
@@ -224,20 +208,20 @@
 
   loginForm.addEventListener("submit", e => {
     e.preventDefault();
-    const level = Number(document.getElementById("clearance").value);
-    const name = document.getElementById("codename").value.trim();
-    if (![3,4,5].includes(level)) {
+    const levelInput = document.getElementById("clearance").value.trim();
+    const nameInput = document.getElementById("codename").value.trim();
+    if (!["3", "4", "5"].includes(levelInput)){
       loginError.textContent = "Access Denied: Clearance level must be 3, 4, or 5.";
       loginError.style.display = "block";
       return;
     }
-    if (name === "") {
+    if (nameInput === ""){
       loginError.textContent = "Please enter a valid codename.";
       loginError.style.display = "block";
       return;
     }
-    clearanceLevel = level;
-    codename = name.toUpperCase();
+    clearanceLevel = Number(levelInput);
+    codename = nameInput.toUpperCase();
     loginError.style.display = "none";
     loginSection.style.display = "none";
     mainMenu.style.display = "block";
@@ -268,38 +252,4 @@
 
   function showSCPs(){
     let html = "<h2>Secure Containment Procedures</h2>";
-    for(const [scp, data] of Object.entries(scps)){
-      html += `<h3>${scp}</h3>
-      <p><strong>Strengths:</strong> ${data.strengths}</p>
-      <p><strong>Weaknesses:</strong> ${data.weaknesses}</p>
-      <p><strong>Containment Procedures:</strong> ${data.containment}</p>
-      <hr>`;
-    }
-    content.innerHTML = html;
-  }
-
-  function showPersonnel(){
-    if (clearanceLevel < 4){
-      content.innerHTML = `<p class="access-denied">ACCESS DENIED: Personnel files require clearance level 4 or higher.</p>`;
-      return;
-    }
-    let html = "<h2>SD Personnel</h2><ul>";
-    for(const [name, link] of Object.entries(agents)){
-      html += `<li><a href="${link}" target="_blank" rel="noopener noreferrer">${name}</a></li>`;
-    }
-    html += "</ul>";
-    content.innerHTML = html;
-  }
-
-  function showTeams(){
-    if (clearanceLevel < 3){
-      content.innerHTML = `<p class="access-denied">ACCESS DENIED: SD Teams require clearance level 3 or higher.</p>`;
-      return;
-    }
-    let html = "<h2>SD Teams</h2><ul>";
-    // Always show Charlie, Quebec, Xray for 3+
-    html += `<li><strong>${sdTeamsData.charlie.name}:</strong> ${sdTeamsData.charlie.description}</li>`;
-    html += `<li><strong>${sdTeamsData.quebec.name}:</strong> ${sdTeamsData.quebec.description}</li>`;
-    html += `<li><strong>${sdTeamsData.xray.name}:</strong> ${sdTeamsData.xray.description}</li>`;
-    if (clearanceLevel >= 4){
-      html += `<li><strong>${sdTeamsData.hotel.name
+   

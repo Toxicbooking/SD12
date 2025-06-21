@@ -8,47 +8,74 @@
     body {
       font-family: 'Courier New', monospace;
       background-color: #000;
-      color: #0f0;
+      color: #fff;
       margin: 0;
-      padding: 0;
     }
+
     .hidden {
       display: none;
     }
+
     header, nav, section {
       padding: 20px;
     }
+
     input, button {
       font-family: inherit;
       padding: 10px;
-      margin-top: 10px;
       background-color: #111;
-      border: 1px solid #0f0;
-      color: #0f0;
+      border: 1px solid #fff;
+      color: #fff;
+      margin-top: 10px;
     }
+
     nav button {
       margin-right: 10px;
     }
+
     .content-section {
       display: none;
     }
+
     .content-section.active {
       display: block;
     }
+
     hr {
-      border-color: #0f0;
+      border-color: #fff;
+    }
+
+    .centered {
+      text-align: center;
+    }
+
+    #transition-screen {
+      font-size: 18px;
+      text-align: center;
+      animation: blink 1s steps(2, start) infinite;
+    }
+
+    @keyframes blink {
+      to {
+        visibility: hidden;
+      }
+    }
+
+    a {
+      color: #0cf;
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
 
-<!-- Clearance Verification -->
+<!-- Clearance Page -->
 <div id="clearance-screen">
-  <header>
+  <header class="centered">
     <h1>Welcome to SCP Site-64</h1>
     <p><strong>Security Clearance Required</strong></p>
   </header>
-  <section>
+  <section class="centered">
     <label for="clearance">Enter Security Clearance Level:</label><br />
     <input type="text" id="clearance" placeholder="e.g., Level 4" />
     <button onclick="verifyClearance()">Verify</button>
@@ -56,7 +83,12 @@
   </section>
 </div>
 
-<!-- Main Site Content -->
+<!-- Transition Screen -->
+<div id="transition-screen" class="hidden">
+  <p>Processing Clearance...</p>
+</div>
+
+<!-- Main Site -->
 <div id="main-site" class="hidden">
   <header>
     <h1>SCP Site-64 Security Department</h1>
@@ -67,46 +99,78 @@
     <button onclick="showSection('scps')">SCPs</button>
     <button onclick="showSection('protocols')">Containment Protocols</button>
     <button onclick="showSection('lore')">Site Lore</button>
-    <button onclick="showSection('emergency')">Emergency Protocols</button>
+    <button onclick="showSection('o5')">O5 Office</button>
   </nav>
 
+  <!-- SCPs -->
   <section id="scps" class="content-section active">
-    <h2>SCP Files</h2>
-    <p><strong>SCP-███</strong>: [Redacted] – Euclid Class.</p>
-    <p><strong>SCP-1981</strong>: “Ronald Reagan Cut Up While Talking.”</p>
-    <p><strong>SCP-3008</strong>: IKEA Infinite – Subject remains under lockdown.</p>
+    <h2>Common SCPs</h2>
+
+    <h3>SCP-173 – "The Sculpture"</h3>
+    <p><strong>Containment:</strong> Kept in a locked container. Two personnel must maintain eye contact at all times.</p>
+    <p><strong>Strength:</strong> Moves incredibly fast when not observed. Can snap necks instantly.</p>
+    <p><strong>Weakness:</strong> Cannot move when observed.</p>
+
+    <h3>SCP-096 – "The Shy Guy"</h3>
+    <p><strong>Containment:</strong> Must be contained in a sealed, soundproof cell. Cameras must not view its face.</p>
+    <p><strong>Strength:</strong> Near-invincible when enraged. Will pursue targets across the globe.</p>
+    <p><strong>Weakness:</strong> Only triggered when someone sees its face.</p>
+
+    <h3>SCP-457 – "Burning Man"</h3>
+    <p><strong>Containment:</strong> Housed in fire-retardant chamber with CO₂ suppression system.</p>
+    <p><strong>Strength:</strong> Consumes heat and grows stronger. Immune to fire.</p>
+    <p><strong>Weakness:</strong> Can be weakened with lack of fuel or oxygen.</p>
+
+    <h3>SCP-999 – "The Tickle Monster"</h3>
+    <p><strong>Containment:</strong> Allowed to roam under observation. Harmless.</p>
+    <p><strong>Strength:</strong> Emits euphoria, cures depression. Potential counter-agent to 682.</p>
+    <p><strong>Weakness:</strong> None currently known.</p>
   </section>
 
+  <!-- Protocols -->
   <section id="protocols" class="content-section">
     <h2>Containment Protocols</h2>
-    <p>All SCPs are to be housed in secure chambers with reinforced material and biometric locks.</p>
-    <p>Unauthorized personnel attempting access will be detained and interrogated.</p>
+    <ul>
+      <li>All SCPs are to be secured in soundproof, reinforced cells.</li>
+      <li>Electronic surveillance must be installed in every containment chamber.</li>
+      <li>Entry requires dual biometric clearance from Level 4+ staff.</li>
+      <li>Mobile Task Forces (MTF) must be on standby at all times.</li>
+      <li>Weekly security audits are mandatory. Breaches trigger lockdowns within 3 seconds.</li>
+      <li>Failure to comply results in disciplinary action or demotion.</li>
+    </ul>
   </section>
 
+  <!-- Lore -->
   <section id="lore" class="content-section">
-    <h2>Site-64 Lore & History</h2>
-    <p>Site-64 was established in Portland, Oregon as a mid-level containment and research facility.</p>
-    <p>Initial operations began in ████ after the discovery of anomalous artifacts in the region.</p>
-    <p>Currently staffed by ██ researchers and ██ armed personnel.</p>
+    <h2>Site-64 Lore</h2>
+    <p>Located in Portland, Oregon, Site-64 is a mid-size secure containment and research site tasked with Pacific Northwest anomalies. Known for its proximity to active anomalous zones and frequent deployment of MTF Psi-7 ("Home Improvement").</p>
+    <p>Founded post-WWII, Site-64 originally operated under Project Bluebook. Its long history includes the containment of early Keter-class threats and housing O5 outposts.</p>
   </section>
 
-  <section id="emergency" class="content-section">
-    <h2>Emergency Protocols</h2>
-    <p>Code Black: Total breach. Initiate site lockdown. Evacuation prohibited.</p>
-    <p>Code Orange: Minor containment failure. Deploy MTF units.</p>
-    <p>Code Green: Drill or false alarm. Resume normal operations.</p>
+  <!-- O5 Office -->
+  <section id="o5" class="content-section">
+    <h2>O5 Council Access</h2>
+    <p>Accessing <a href="https://www.site64.site/o5-office" target="_blank">O5 Office</a>...</p>
+    <p><em>NOTICE:</em> Unauthorized access is monitored. You are being watched.</p>
   </section>
 </div>
 
 <script>
   function verifyClearance() {
     const level = document.getElementById("clearance").value.trim().toLowerCase();
-    const allowed = ["level 4", "4", "admin", "o5"];
-    if (allowed.includes(level)) {
+    const validLevels = ["level 3", "level 4", "level 5", "3", "4", "5"];
+
+    if (validLevels.includes(level)) {
       document.getElementById("clearance-screen").classList.add("hidden");
-      document.getElementById("main-site").classList.remove("hidden");
+      document.getElementById("transition-screen").classList.remove("hidden");
+
+      // Fake loading
+      setTimeout(() => {
+        document.getElementById("transition-screen").classList.add("hidden");
+        document.getElementById("main-site").classList.remove("hidden");
+      }, 2500);
     } else {
-      document.getElementById("error").innerText = "ACCESS DENIED: Insufficient clearance.";
+      document.getElementById("error").innerText = "ACCESS DENIED: Level 3 or higher required.";
     }
   }
 

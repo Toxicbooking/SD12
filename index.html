@@ -1,4 +1,4 @@
-<!-- Updated SD Terminal HTML with animated transitions and bug fix -->
+<!-- Fully updated SD Terminal HTML with fixed navigation for all sections -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -194,12 +194,39 @@
         }
         content.innerHTML = '<h2>SD Personnel Files</h2>' +
           Object.entries(personnelLinks).map(([name, url]) => `<p><a href="${url}" target="_blank">${name}</a></p>`).join('');
-      }
-      else if (section === 'sd-lore') {
+
+      } else if (section === 'sd-lore') {
         content.innerHTML = `<h2>SD Lore</h2>
         <p>The Security Department (SD) is a division of the SCP Foundation, consisting of agents tasked with guarding the Foundation's secret bases and containment facilities. Their job duties include preventing containment breaches, keeping D-class personnel under control and forcing them to cooperate in experiments, and defending the site from external attacks by hostile forces or anomalous threats.</p>`;
+
+      } else if (section === 'scp') {
+        content.innerHTML = `<h2>Common SCP Files</h2>
+        <ul>
+          <li><strong>SCP-173</strong>: Must remain in direct sight. Containment relies on at least 3 personnel present. Weak to blinking.</li>
+          <li><strong>SCP-096</strong>: Avoid seeing the face. Containment involves facing walls and blindfolds. Strength: speed and rage. Weakness: no facial exposure.</li>
+          <li><strong>SCP-457</strong>: Fire entity. Contained in non-flammable environment. Weak to suppression foam. Strength: heat, growth via flammables.</li>
+          <li><strong>SCP-999</strong>: Harmless. Contained for research. Brings happiness. Strength: pacification. Weakness: none known.</li>
+        </ul>`;
+
+      } else if (section === 'protocols') {
+        content.innerHTML = `<h2>Enhanced Containment Protocols</h2>
+        <p>Protocols include multi-lock cell doors, surveillance AI, remote tranquilization, biometric scan systems, fail-safe turrets, and auto-seal quarantine in breach cases.</p>`;
+
+      } else if (section === 'teams') {
+        let teamHTML = `<h2>SD Teams</h2>`;
+        if (clearanceLevel >= 3) {
+          teamHTML += `<p><strong>Team Charlie</strong>: Handles CDC (Containment Duty Control) and LCZ operations. Responsible for interior patrols, escort, and incident response.</p>
+            <p><strong>Team Quebec</strong>: Assigned to MCZ and HCZ, monitoring key zones and checkpoint security. Conducts containment lockdowns.</p>
+            <p><strong>Team X-Ray</strong>: Provides security for Administrative checkpoints and protection of on-site VIPs.</p>`;
+        }
+        if (clearanceLevel >= 4) {
+          teamHTML += `<p><strong>Team Hotel</strong>: Elite VIP protection unit. Highly trained in precision combat and threat interception during breach conditions.</p>`;
+        }
+        if (clearanceLevel >= 5) {
+          teamHTML += `<p><strong>STFO "Elite Enforcers"</strong>: Former [REDACTED] Unit, now under SD. Specialists in rapid tactical deployment and anomaly suppression. Operate in high-risk environments, elite status.</p>`;
+        }
+        content.innerHTML = teamHTML;
       }
-      // Add more handlers for other sections
     });
   });
 </script>

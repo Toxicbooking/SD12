@@ -1,4 +1,4 @@
-<!-- Updated SD Terminal HTML -->
+<!-- Updated SD Terminal HTML with animated transitions and bug fix -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,15 +13,18 @@
       font-family: 'Share Tech Mono', monospace;
       margin: 0;
       padding: 0;
+      overflow-x: hidden;
     }
     header {
       text-align: center;
-      padding: 40px 20px 20px;
+      padding: 60px 20px 20px;
+      animation: fadeIn 2s ease-out;
     }
     #top-info {
-      font-size: 2.5rem;
+      font-size: 3rem;
       font-weight: bold;
       margin-bottom: 10px;
+      letter-spacing: 2px;
     }
     #login-section {
       display: flex;
@@ -29,6 +32,7 @@
       align-items: center;
       justify-content: center;
       height: 70vh;
+      animation: fadeIn 2s ease-out;
     }
     #login-section h2 {
       font-size: 2rem;
@@ -54,6 +58,7 @@
       cursor: pointer;
       font-size: 1rem;
       margin-top: 10px;
+      transition: all 0.3s ease;
     }
     button:hover {
       background: white;
@@ -67,6 +72,7 @@
     nav {
       text-align: center;
       margin-top: 20px;
+      animation: fadeIn 1s ease-in-out;
     }
     nav button {
       margin: 0 10px;
@@ -75,6 +81,7 @@
       padding: 20px;
       max-width: 900px;
       margin: auto;
+      animation: fadeIn 1.5s ease-in-out;
     }
     h2 {
       border-bottom: 1px solid white;
@@ -94,6 +101,10 @@
       border-radius: 2px;
       padding: 0 4px;
       user-select: none;
+    }
+    @keyframes fadeIn {
+      0% {opacity: 0; transform: translateY(-10px);}
+      100% {opacity: 1; transform: translateY(0);}
     }
   </style>
 </head>
@@ -169,6 +180,27 @@
     loginSection.style.display = "none";
     mainMenu.style.display = "block";
     content.innerHTML = "";
+  });
+
+  document.querySelectorAll('nav button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const section = btn.getAttribute('data-section');
+      content.innerHTML = '';
+
+      if (section === 'personnel') {
+        if (clearanceLevel < 4) {
+          content.innerHTML = '<p class="access-denied">ACCESS DENIED: LEVEL 4 OR HIGHER REQUIRED</p>';
+          return;
+        }
+        content.innerHTML = '<h2>SD Personnel Files</h2>' +
+          Object.entries(personnelLinks).map(([name, url]) => `<p><a href="${url}" target="_blank">${name}</a></p>`).join('');
+      }
+      else if (section === 'sd-lore') {
+        content.innerHTML = `<h2>SD Lore</h2>
+        <p>The Security Department (SD) is a division of the SCP Foundation, consisting of agents tasked with guarding the Foundation's secret bases and containment facilities. Their job duties include preventing containment breaches, keeping D-class personnel under control and forcing them to cooperate in experiments, and defending the site from external attacks by hostile forces or anomalous threats.</p>`;
+      }
+      // Add more handlers for other sections
+    });
   });
 </script>
 

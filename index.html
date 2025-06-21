@@ -1,19 +1,18 @@
 import React, { useState } from "react";
 
 export default function SDDatabase() {
-  // State for login
+  // States for login and user
   const [clearance, setClearance] = useState(null);
   const [codename, setCodename] = useState("");
   const [inputClearance, setInputClearance] = useState("");
   const [inputCodename, setInputCodename] = useState("");
 
-  // SCP search states
+  // SCP Search states
   const [scpSearch, setScpSearch] = useState("");
   const [scpInfo, setScpInfo] = useState("");
   const [scpLoading, setScpLoading] = useState(false);
   const [scpError, setScpError] = useState("");
 
-  // Login handler
   function handleLogin() {
     const lvl = parseInt(inputClearance);
     if ([3, 4, 5].includes(lvl) && inputCodename.trim() !== "") {
@@ -24,23 +23,20 @@ export default function SDDatabase() {
     }
   }
 
-  // SCP Wiki fetch helper
   async function fetchSCPInfo(scpId) {
     setScpLoading(true);
     setScpError("");
     setScpInfo("");
 
-    // Format SCP id for URL, e.g. "173" -> "scp-173"
     let scpPage = scpId.toLowerCase();
     if (!scpPage.startsWith("scp-")) {
       scpPage = "scp-" + scpPage;
     }
 
-    // Construct SCP Wiki URL
     const wikiUrl = `https://scp-wiki.wikidot.com/${scpPage}`;
 
     try {
-      // Fetch via proxy to avoid CORS issues - implement backend proxy or use a public one
+      // Replace this with your proxy URL that fetches the SCP Wiki page
       const proxyUrl = `/api/proxy?url=${encodeURIComponent(wikiUrl)}`;
 
       const res = await fetch(proxyUrl);
@@ -48,14 +44,12 @@ export default function SDDatabase() {
 
       const text = await res.text();
 
-      // Parse the HTML text to extract main page content (using DOMParser in browser)
       const parser = new DOMParser();
       const doc = parser.parseFromString(text, "text/html");
-
       const contentEl = doc.querySelector("#page-content");
+
       if (!contentEl) throw new Error("SCP content not found.");
 
-      // Get first 2000 chars to avoid overload
       let contentText = contentEl.innerText.trim().slice(0, 2000);
       setScpInfo(contentText);
     } catch (err) {
@@ -65,7 +59,6 @@ export default function SDDatabase() {
     }
   }
 
-  // SCP search handler
   function handleScpSearch() {
     if (scpSearch.trim() === "") {
       alert("Enter SCP number or name to search.");
@@ -74,17 +67,37 @@ export default function SDDatabase() {
     fetchSCPInfo(scpSearch.trim());
   }
 
-  // If not logged in yet
   if (!clearance) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-black text-white">
-        <h1 className="text-6xl font-bold mb-6">SD DATABASE</h1>
+      <div
+        style={{
+          height: "100vh",
+          backgroundColor: "black",
+          color: "white",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          fontFamily: "monospace",
+          padding: 20,
+        }}
+      >
+        <h1 style={{ fontSize: 64, marginBottom: 40 }}>SD DATABASE</h1>
         <input
-          className="mb-2 p-3 bg-zinc-800 text-white rounded text-xl text-center w-64"
+          style={{
+            marginBottom: 12,
+            padding: 10,
+            backgroundColor: "#111",
+            color: "white",
+            border: "1px solid white",
+            borderRadius: 4,
+            fontSize: 18,
+            textAlign: "center",
+            width: 250,
+          }}
           placeholder="Enter Clearance Level (3,4,5)"
           value={inputClearance}
           onChange={(e) => {
-            // Allow only 1 digit and numeric input
             const val = e.target.value;
             if (val === "" || (/^[345]$/.test(val) && val.length <= 1)) {
               setInputClearance(val);
@@ -92,14 +105,32 @@ export default function SDDatabase() {
           }}
         />
         <input
-          className="mb-4 p-3 bg-zinc-800 text-white rounded text-xl text-center w-64"
+          style={{
+            marginBottom: 20,
+            padding: 10,
+            backgroundColor: "#111",
+            color: "white",
+            border: "1px solid white",
+            borderRadius: 4,
+            fontSize: 18,
+            textAlign: "center",
+            width: 250,
+          }}
           placeholder="Enter Codename"
           value={inputCodename}
           onChange={(e) => setInputCodename(e.target.value)}
         />
         <button
           onClick={handleLogin}
-          className="px-6 py-3 bg-white text-black font-bold rounded hover:bg-gray-300 transition"
+          style={{
+            padding: "10px 40px",
+            fontSize: 18,
+            fontWeight: "bold",
+            backgroundColor: "white",
+            color: "black",
+            borderRadius: 6,
+            cursor: "pointer",
+          }}
         >
           LOGIN
         </button>
@@ -107,22 +138,44 @@ export default function SDDatabase() {
     );
   }
 
-  // Logged-in view with sections and SCP Search
+  // Main page after login
   return (
-    <div className="p-6 bg-black min-h-screen text-white max-w-5xl mx-auto font-sans">
-      {/* Header with codename and clearance */}
-      <header className="flex justify-between items-center mb-8">
-        <h1 className="text-5xl font-extrabold tracking-widest">SD DATABASE</h1>
-        <div className="text-lg">
-          Codename: <span className="font-mono">{codename}</span> | Clearance Level:{" "}
-          <span className="font-mono">{clearance}</span>
+    <div
+      style={{
+        backgroundColor: "black",
+        color: "white",
+        minHeight: "100vh",
+        padding: 20,
+        fontFamily: "monospace",
+        maxWidth: 900,
+        margin: "auto",
+      }}
+    >
+      {/* Header */}
+      <header
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          borderBottom: "1px solid white",
+          paddingBottom: 12,
+          marginBottom: 30,
+        }}
+      >
+        <h1 style={{ fontSize: 48, fontWeight: "bold", letterSpacing: 4 }}>
+          SD DATABASE
+        </h1>
+        <div style={{ fontSize: 18 }}>
+          Codename: <strong>{codename}</strong> | Clearance Level: <strong>{clearance}</strong>
         </div>
       </header>
 
       {/* SD Lore */}
-      <section className="mb-10">
-        <h2 className="text-3xl font-bold mb-3 border-b border-white/40 pb-1">SD Lore</h2>
-        <p className="max-w-prose leading-relaxed text-white/80">
+      <section style={{ marginBottom: 40 }}>
+        <h2 style={{ fontSize: 28, borderBottom: "1px solid white", paddingBottom: 8 }}>
+          SD Lore
+        </h2>
+        <p style={{ maxWidth: 700, color: "#ddd", lineHeight: 1.5, marginTop: 12 }}>
           The Security Department (SD) is a division of the SCP Foundation, consisting of agents
           tasked with guarding the Foundation's secret bases and containment facilities. Their job
           duties include preventing containment breaches (SCPs escaping from the site), keeping D-class
@@ -133,14 +186,15 @@ export default function SDDatabase() {
       </section>
 
       {/* SD Teams */}
-      <section className="mb-10">
-        <h2 className="text-3xl font-bold mb-3 border-b border-white/40 pb-1">SD Teams</h2>
+      <section style={{ marginBottom: 40 }}>
+        <h2 style={{ fontSize: 28, borderBottom: "1px solid white", paddingBottom: 8 }}>
+          SD Teams
+        </h2>
 
-        {/* Teams for L3+ */}
-        {(clearance >= 3) && (
+        {clearance >= 3 && (
           <>
-            <h3 className="text-2xl font-semibold mt-2">Teams Accessible at L3+</h3>
-            <ul className="list-disc list-inside mb-4">
+            <h3 style={{ fontSize: 22, marginTop: 16 }}>Teams Accessible at L3+</h3>
+            <ul style={{ marginLeft: 20, marginTop: 8, lineHeight: 1.4 }}>
               <li>
                 <strong>Charlie:</strong> CDC and LCZ work.
               </li>
@@ -154,79 +208,45 @@ export default function SDDatabase() {
           </>
         )}
 
-        {/* Team Hotel L4+ */}
-        {(clearance >= 4) && (
+        {clearance >= 4 && (
           <>
-            <h3 className="text-2xl font-semibold mt-2">Team Accessible at L4+</h3>
-            <p className="mb-4">
+            <h3 style={{ fontSize: 22, marginTop: 16 }}>Team Accessible at L4+</h3>
+            <p style={{ marginTop: 8 }}>
               <strong>Hotel:</strong> Guards VIP but is way more skilled in PVP.
             </p>
           </>
         )}
 
-        {/* STFO L5+ */}
-        {(clearance >= 5) && (
+        {clearance >= 5 && (
           <>
-            <h3 className="text-2xl font-semibold mt-2">Team Accessible at L5+</h3>
-            <p className="mb-4">
+            <h3 style={{ fontSize: 22, marginTop: 16 }}>Team Accessible at L5+</h3>
+            <p style={{ marginTop: 8 }}>
               <strong>STFO "Elite enforcers":</strong> A group from ████, similar to RESH-1 but in SD.
             </p>
           </>
         )}
       </section>
 
-      {/* Personnel - only L4+ can see files, L3 sees access denied */}
-      <section className="mb-10">
-        <h2 className="text-3xl font-bold mb-3 border-b border-white/40 pb-1">SD Personnel</h2>
+      {/* Personnel */}
+      <section style={{ marginBottom: 40 }}>
+        <h2 style={{ fontSize: 28, borderBottom: "1px solid white", paddingBottom: 8 }}>
+          SD Personnel
+        </h2>
         {clearance >= 4 ? (
-          <ul className="list-disc list-inside max-w-prose space-y-2">
-            {/* Example personnel, add links and details here */}
+          <ul style={{ marginLeft: 20, lineHeight: 1.6, maxWidth: 700 }}>
             <li>
-              <a href="https://docs.google.com/document/d/19y8PjZXeLRLeM5YRb2OrC5P0a-y_LOkVk4Qapm9vlTI/edit?usp=sharing" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-400">
+              <a
+                href="https://docs.google.com/document/d/19y8PjZXeLRLeM5YRb2OrC5P0a-y_LOkVk4Qapm9vlTI/edit?usp=sharing"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "#ccc", textDecoration: "underline" }}
+              >
                 Warrant Officer "Ratchet"
               </a>
             </li>
             <li>
-              <a href="https://docs.google.com/document/d/1TNidYCG7qQ5wLJbqSQqMU0RDAHTgP7LvIxFIUXUkkBs/edit?usp=sharing" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-400">
-                Chinatsu
-              </a>
-            </li>
-            <li>
-              <a href="https://docs.google.com/document/d/1fNKU8Zk5LhS8fIYzQXKME80eI3Rm7agee9KIYOEhDys/edit?usp=sharing" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-400">
-                Aegis
-              </a>
-            </li>
-            {/* Add all other members similarly */}
-          </ul>
-        ) : (
-          <p className="italic text-red-500 font-semibold">Access Denied: Personnel files require Level 4 clearance or higher.</p>
-        )}
-      </section>
-
-      {/* SCP Search Section */}
-      <section className="mb-10">
-        <h2 className="text-3xl font-bold mb-3 border-b border-white/40 pb-1">SCP Search</h2>
-        <div className="flex flex-col md:flex-row md:items-center gap-4 max-w-xl">
-          <input
-            type="text"
-            placeholder="Search SCP (e.g. 173, SCP-096)"
-            value={scpSearch}
-            onChange={(e) => setScpSearch(e.target.value)}
-            className="flex-grow p-2 rounded bg-zinc-800 text-white"
-          />
-          <button
-            onClick={handleScpSearch}
-            className="px-5 py-2 bg-white text-black font-semibold rounded hover:bg-gray-300 transition"
-          >
-            Search
-          </button>
-        </div>
-        <div className="mt-4 max-w-3xl whitespace-pre-wrap bg-zinc-900 p-4 rounded min-h-[100px]">
-          {scpLoading && <p>Loading SCP info...</p>}
-          {scpError && <p className="text-red-500">{scpError}</p>}
-          {!scpLoading && !scpError && scpInfo && <p>{scpInfo}</p>}
-        </div>
-      </section>
-    </div>
-  );
-}
+              <a
+                href="https://docs.google.com/document/d/1TNidYCG7qQ5wLJbqSQqMU0RDAHTgP7LvIxFIUXUkkBs/edit?usp=sharing"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "#ccc", textDecoration: "underline

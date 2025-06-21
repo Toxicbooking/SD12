@@ -10,7 +10,7 @@
     color: white;
     font-family: monospace;
     padding: 30px;
-    max-width: 800px;
+    max-width: 900px;
     margin: auto;
   }
   #login-container, #main-content {
@@ -50,12 +50,39 @@
     background-color: #222;
     color: #0f0;
   }
+  a {
+    color: #0f0;
+    text-decoration: underline;
+  }
+  a:hover {
+    color: #8f8;
+  }
+  #content {
+    white-space: pre-wrap;
+    margin-top: 20px;
+  }
+  #scp-search-bar {
+    margin-top: 10px;
+  }
+  #scp-search-bar input {
+    width: 70%;
+    display: inline-block;
+  }
+  #scp-search-bar button {
+    width: 25%;
+    display: inline-block;
+  }
+  .access-denied {
+    color: red;
+    font-weight: bold;
+    margin-top: 20px;
+  }
 </style>
 </head>
 <body>
 
 <div id="login-container" class="active">
-  <h1>SD DATABASE LOGIN</h1>
+  <h1 style="font-size: 3em; margin-bottom: 30px;">SD DATABASE LOGIN</h1>
   <input id="clearance" type="text" placeholder="Clearance Level (3, 4, or 5)" maxlength="1" />
   <input id="codename" type="text" placeholder="Codename" />
   <button id="login-btn">LOGIN</button>
@@ -64,12 +91,14 @@
 
 <div id="main-content">
   <h1>SD DATABASE</h1>
-  <div id="user-info"></div>
+  <div id="user-info" style="margin-bottom: 10px; font-weight: bold;"></div>
   <div id="menu">
     <div data-section="lore">SD LORE</div>
     <div data-section="teams">SD TEAMS</div>
+    <div data-section="personnel">PERSONNEL</div>
+    <div data-section="scp-search">SCP SEARCH</div>
   </div>
-  <div id="content" style="white-space: pre-wrap; margin-top:20px;"></div>
+  <div id="content"></div>
 </div>
 
 <script>
@@ -84,6 +113,52 @@
   const content = document.getElementById("content");
 
   const validClearances = ['3', '4', '5'];
+  let userClearance = null;
+  let userCodename = null;
+
+  // Personnel data with codenames and document links
+  const personnel = {
+    "Ratchet": "https://docs.google.com/document/d/19y8PjZXeLRLeM5YRb2OrC5P0a-y_LOkVk4Qapm9vlTI/edit?tab=t.0",
+    "Black dawn": "https://docs.google.com/document/u/0/d/1_EHJ-ut4quezxCJSCrMR4vzMZpouqms10R9xtZA5tUY/mobilebasic",
+    "Caelum": "https://docs.google.com/document/d/1u4WypRconLkVQl2Kpyfo_-relGRMSm6kDn3RW5pOSqw/edit?usp=sharing",
+    "Forge": "https://docs.google.com/document/d/1ihlLNXQDcQJWf-G8_ok3o8gZuD7j6ADwehyaVd29atw/edit?tab=t.0",
+    "Bell": "https://docs.google.com/document/d/1Pe9M_jB5Ak95i-uoy9_3GvBNYkqAnEjyPIlboQxP7pE/edit?usp=sharing",
+    "Toxic": "https://docs.google.com/document/d/1lhK-biGd6koGAMax01xtLYSweqGb8fm4fWI4RyZSdMM/edit?tab=t.0",
+    "Chinatsu": "https://docs.google.com/document/d/1TNidYCG7qQ5wLJbqSQqMU0RDAHTgP7LvIxFIUXUkkBs/edit?usp=sharing",
+    "Aegis": "https://docs.google.com/document/d/1fNKU8Zk5LhS8fIYzQXKME80eI3Rm7agee9KIYOEhDys/edit?sharingaction=ownershiptransfer&pli=1&tab=t.0",
+    "Ulgrin": "https://docs.google.com/document/d/1dQwQMj6c8bjreWdlK2y7C0zg1Obf8Iz-kL1O-ogw22g/edit?usp=sharing",
+    "BOBO": "https://docs.google.com/document/d/1kTlLTzDJTNJwjrM8HNwYj5ym-vBFG6UuvwwIt09Sc88/edit?tab=t.0",
+    "Ziomal": "https://docs.google.com/document/d/1WhzA9yJcVwNOW5aa2QeH5dAn48IRxm2XuD_-1Q83V-4/edit?tab=t.0",
+    "Chrashium": "https://docs.google.com/document/d/1ux5b5K16cTIQWliSNCwoCO4HraCqr7CdW3TiUO2PPf8/edit?usp=sharing",
+    "Trooper": "https://docs.google.com/document/u/0/d/1D4edfHHDRQGbtG2PHP26tiD9lmGliEpnXdhhs3Vbuqg/mobilebasic"
+  };
+
+  // SD Teams data with clearance requirements and descriptions
+  const sdTeams = {
+    "Charlie": {
+      clearance: 3,
+      desc: "Charlie does CDC and LCZ work."
+    },
+    "Quebec": {
+      clearance: 3,
+      desc: "Quebec does MCZ and HCZ checkpoints and patrols."
+    },
+    "Xray": {
+      clearance: 3,
+      desc: "Xray guards AD checkpoint and VIPs."
+    },
+    "Hotel": {
+      clearance: 4,
+      desc: "Hotel guards VIPs and other critical zones with enhanced security."
+    },
+    "STFO": {
+      clearance: 5,
+      desc: "STFO are elite enforcers from ███ (blanked) assigned to high-risk operations within SD."
+    }
+  };
+
+  // SD Lore text
+  const sdLore = `The Security Department (SD) is a division of the SCP Foundation, consisting of agents tasked with guarding the Foundation's secret bases and containment facilities. Their job duties include preventing containment breaches (SCPs escaping from the site), keeping D-class personnel under control and forcing them to cooperate in laboratory experiments, and defending the site from external attacks by hostile forces (whether that be an enemy Group of Interest or something more anomalous).`;
 
   loginBtn.addEventListener("click", () => {
     loginError.textContent = "";
@@ -99,23 +174,118 @@
       return;
     }
 
-    // Success: Hide login, show main content
+    userClearance = parseInt(clearance);
+    userCodename = codename;
+
     loginContainer.classList.remove("active");
     mainContent.classList.add("active");
-    userInfo.textContent = `User: ${codename} | Clearance: ${clearance}`;
+    userInfo.textContent = `User: ${userCodename} | Clearance: L${userClearance}`;
+
     content.textContent = "Welcome! Please select a menu option.";
   });
 
   menu.addEventListener("click", (e) => {
     if (!e.target.dataset.section) return;
 
-    if (e.target.dataset.section === "lore") {
-      content.textContent = `Security Department (SD) is tasked with guarding SCP facilities and preventing containment breaches.`;
-    } else if (e.target.dataset.section === "teams") {
-      content.textContent = `Teams:\n- Charlie: CDC and LCZ work.\n- Quebec: MCZ and HCZ checkpoints.\n- Xray: AD checkpoint guards.`;
+    const section = e.target.dataset.section;
+    if (section === "lore") {
+      content.textContent = sdLore;
+    } else if (section === "teams") {
+      let teamText = "";
+      for (const [team, data] of Object.entries(sdTeams)) {
+        if (userClearance >= data.clearance) {
+          teamText += `- ${team}: ${data.desc}\n`;
+        }
+      }
+      if (teamText === "") {
+        teamText = "Access Denied: No teams available at your clearance level.";
+      }
+      content.textContent = teamText;
+    } else if (section === "personnel") {
+      if (userClearance >= 4) {
+        // Show personnel list with links
+        let persText = "Personnel List:\n";
+        for (const [name, link] of Object.entries(personnel)) {
+          persText += `- ${name}: ${link}\n`;
+        }
+        content.textContent = "";
+        // Replace content with clickable links instead of plain text
+        content.innerHTML = "Personnel List:<br><ul>" +
+          Object.entries(personnel).map(([name, link]) =>
+            `<li><a href="${link}" target="_blank" rel="noopener noreferrer">${name}</a></li>`).join('') +
+          "</ul>";
+      } else {
+        content.innerHTML = `<div class="access-denied">Access Denied: Personnel section requires clearance L4 or higher.</div>`;
+      }
+    } else if (section === "scp-search") {
+      content.innerHTML = `
+        <div id="scp-search-bar">
+          <input type="text" id="scp-query" placeholder="Enter SCP number or name (e.g. 173)" />
+          <button id="scp-search-btn">Search</button>
+        </div>
+        <div id="scp-result" style="margin-top:15px; max-height: 400px; overflow-y:auto; background:#111; padding:10px; border-radius:6px;"></div>
+      `;
+
+      document.getElementById("scp-search-btn").addEventListener("click", () => {
+        const query = document.getElementById("scp-query").value.trim();
+        if (!query) {
+          alert("Please enter an SCP number or name.");
+          return;
+        }
+        searchSCP(query);
+      });
     }
   });
 
+  async function searchSCP(query) {
+    const resultDiv = document.getElementById("scp-result");
+    resultDiv.textContent = "Searching SCP Wiki...";
+
+    // Format query - e.g. "SCP-173" or "SCP-096"
+    let formattedQuery = query.toUpperCase();
+    if (!formattedQuery.startsWith("SCP-")) {
+      if (/^\d+$/.test(formattedQuery)) {
+        formattedQuery = "SCP-" + formattedQuery.padStart(3, '0'); // e.g. 173 -> SCP-173
+      } else {
+        // If user entered name or partial, just try SCP-query
+        formattedQuery = "SCP-" + formattedQuery;
+      }
+    }
+
+    try {
+      // Using the SCP Wiki's official API at scp-wiki.wikidot.com is tricky due to CORS,
+      // so we'll use the public Fandom wiki API as a fallback:
+      // We'll fetch the page content summary from fandom:
+
+      const apiUrl = `https://scp-wiki.fandom.com/api.php?action=query&format=json&prop=extracts&exintro&titles=${encodeURIComponent(formattedQuery)}`;
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+
+      const pages = data.query.pages;
+      const page = Object.values(pages)[0];
+
+      if (!page || page.missing === "") {
+        resultDiv.textContent = "SCP entry not found on the wiki.";
+        return;
+      }
+
+      let extract = page.extract;
+
+      if (!extract) {
+        resultDiv.textContent = "No summary found for that SCP.";
+        return;
+      }
+
+      // Strip HTML tags except basic allowed tags
+      extract = extract.replace(/<\/?[^>]+(>|$)/g, "");
+
+      resultDiv.textContent = extract;
+
+    } catch (err) {
+      resultDiv.textContent = "Error fetching SCP data.";
+      console.error(err);
+    }
+  }
 </script>
 
 </body>

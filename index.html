@@ -1,85 +1,232 @@
-// Full SD Database Website Code (Restored Login, Clearance, and SCP Wiki Search Integration)
-
 import React, { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 
 export default function SDDatabase() {
-  const [clearance, setClearance] = useState(0);
+  // State for login
+  const [clearance, setClearance] = useState(null);
   const [codename, setCodename] = useState("");
   const [inputClearance, setInputClearance] = useState("");
   const [inputCodename, setInputCodename] = useState("");
+
+  // SCP search states
   const [scpSearch, setScpSearch] = useState("");
-  const [scpData, setScpData] = useState(null);
+  const [scpInfo, setScpInfo] = useState("");
+  const [scpLoading, setScpLoading] = useState(false);
+  const [scpError, setScpError] = useState("");
 
-  const handleLogin = () => {
-    const level = parseInt(inputClearance);
-    if ([3, 4, 5].includes(level)) {
-      setClearance(level);
-      setCodename(inputCodename);
+  // Login handler
+  function handleLogin() {
+    const lvl = parseInt(inputClearance);
+    if ([3, 4, 5].includes(lvl) && inputCodename.trim() !== "") {
+      setClearance(lvl);
+      setCodename(inputCodename.trim());
+    } else {
+      alert("Invalid clearance (must be 3, 4, or 5) and non-empty codename.");
     }
-  };
+  }
 
-  const handleScpSearch = async () => {
+  // SCP Wiki fetch helper
+  async function fetchSCPInfo(scpId) {
+    setScpLoading(true);
+    setScpError("");
+    setScpInfo("");
+
+    // Format SCP id for URL, e.g. "173" -> "scp-173"
+    let scpPage = scpId.toLowerCase();
+    if (!scpPage.startsWith("scp-")) {
+      scpPage = "scp-" + scpPage;
+    }
+
+    // Construct SCP Wiki URL
+    const wikiUrl = `https://scp-wiki.wikidot.com/${scpPage}`;
+
     try {
-      const searchTerm = scpSearch.toLowerCase().replace(/\s+/g, "-");
-      const url = `https://scp-wiki.wikidot.com/${searchTerm}`;
-      const response = await fetch(`/api/proxy?url=${encodeURIComponent(url)}`);
-      const text = await response.text();
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(text, 'text/html');
-      const content = doc.querySelector("#page-content");
-      setScpData(content ? content.innerText.slice(0, 2000) : "SCP not found or content blocked.");
-    } catch {
-      setScpData("Failed to fetch SCP information.");
-    }
-  };
+      // Fetch via proxy to avoid CORS issues - implement backend proxy or use a public one
+      const proxyUrl = `/api/proxy?url=${encodeURIComponent(wikiUrl)}`;
 
-  if (!codename) {
+      const res = await fetch(proxyUrl);
+      if (!res.ok) throw new Error("Failed to fetch SCP data.");
+
+      const text = await res.text();
+
+      // Parse the HTML text to extract main page content (using DOMParser in browser)
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(text, "text/html");
+
+      const contentEl = doc.querySelector("#page-content");
+      if (!contentEl) throw new Error("SCP content not found.");
+
+      // Get first 2000 chars to avoid overload
+      let contentText = contentEl.innerText.trim().slice(0, 2000);
+      setScpInfo(contentText);
+    } catch (err) {
+      setScpError("Error fetching SCP info: " + err.message);
+    } finally {
+      setScpLoading(false);
+    }
+  }
+
+  // SCP search handler
+  function handleScpSearch() {
+    if (scpSearch.trim() === "") {
+      alert("Enter SCP number or name to search.");
+      return;
+    }
+    fetchSCPInfo(scpSearch.trim());
+  }
+
+  // If not logged in yet
+  if (!clearance) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-black text-white">
         <h1 className="text-6xl font-bold mb-6">SD DATABASE</h1>
         <input
-          className="mb-2 p-2 bg-zinc-800 text-white rounded"
-          placeholder="Enter Clearance Level"
-          onChange={(e) => setInputClearance(e.target.value)}
+          className="mb-2 p-3 bg-zinc-800 text-white rounded text-xl text-center w-64"
+          placeholder="Enter Clearance Level (3,4,5)"
+          value={inputClearance}
+          onChange={(e) => {
+            // Allow only 1 digit and numeric input
+            const val = e.target.value;
+            if (val === "" || (/^[345]$/.test(val) && val.length <= 1)) {
+              setInputClearance(val);
+            }
+          }}
         />
         <input
-          className="mb-4 p-2 bg-zinc-800 text-white rounded"
+          className="mb-4 p-3 bg-zinc-800 text-white rounded text-xl text-center w-64"
           placeholder="Enter Codename"
+          value={inputCodename}
           onChange={(e) => setInputCodename(e.target.value)}
         />
-        <Button onClick={handleLogin}>LOGIN</Button>
+        <button
+          onClick={handleLogin}
+          className="px-6 py-3 bg-white text-black font-bold rounded hover:bg-gray-300 transition"
+        >
+          LOGIN
+        </button>
       </div>
     );
   }
 
+  // Logged-in view with sections and SCP Search
   return (
-    <div className="p-6 text-white">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-5xl font-extrabold">SD DATABASE</h1>
-        <p className="text-xl">Codename: {codename} | Level: {clearance}</p>
-      </div>
+    <div className="p-6 bg-black min-h-screen text-white max-w-5xl mx-auto font-sans">
+      {/* Header with codename and clearance */}
+      <header className="flex justify-between items-center mb-8">
+        <h1 className="text-5xl font-extrabold tracking-widest">SD DATABASE</h1>
+        <div className="text-lg">
+          Codename: <span className="font-mono">{codename}</span> | Clearance Level:{" "}
+          <span className="font-mono">{clearance}</span>
+        </div>
+      </header>
 
-      <div className="my-6">
-        <h2 className="text-3xl font-bold mb-2">SCP DATABASE</h2>
-        <input
-          className="p-2 w-full md:w-1/2 bg-zinc-800 text-white rounded"
-          placeholder="Search SCP (e.g. SCP-173)"
-          value={scpSearch}
-          onChange={(e) => setScpSearch(e.target.value)}
-        />
-        <Button className="ml-2" onClick={handleScpSearch}>Search</Button>
-        {scpData && (
-          <Card className="bg-zinc-800 mt-4">
-            <CardContent className="p-4 whitespace-pre-wrap">
-              <p>{scpData}</p>
-            </CardContent>
-          </Card>
+      {/* SD Lore */}
+      <section className="mb-10">
+        <h2 className="text-3xl font-bold mb-3 border-b border-white/40 pb-1">SD Lore</h2>
+        <p className="max-w-prose leading-relaxed text-white/80">
+          The Security Department (SD) is a division of the SCP Foundation, consisting of agents
+          tasked with guarding the Foundation's secret bases and containment facilities. Their job
+          duties include preventing containment breaches (SCPs escaping from the site), keeping D-class
+          personnel under control and forcing them to cooperate in laboratory experiments, and defending
+          the site from external attacks by hostile forces (whether that be an enemy Group of Interest
+          or something more anomalous).
+        </p>
+      </section>
+
+      {/* SD Teams */}
+      <section className="mb-10">
+        <h2 className="text-3xl font-bold mb-3 border-b border-white/40 pb-1">SD Teams</h2>
+
+        {/* Teams for L3+ */}
+        {(clearance >= 3) && (
+          <>
+            <h3 className="text-2xl font-semibold mt-2">Teams Accessible at L3+</h3>
+            <ul className="list-disc list-inside mb-4">
+              <li>
+                <strong>Charlie:</strong> CDC and LCZ work.
+              </li>
+              <li>
+                <strong>Quebec:</strong> MCZ and HCZ checkpoints and patrols.
+              </li>
+              <li>
+                <strong>Xray:</strong> Guards AD checkpoint and VIPs.
+              </li>
+            </ul>
+          </>
         )}
-      </div>
 
-      {/* Keep other content (Lore, SD Teams, Personnel, etc.) here */}
+        {/* Team Hotel L4+ */}
+        {(clearance >= 4) && (
+          <>
+            <h3 className="text-2xl font-semibold mt-2">Team Accessible at L4+</h3>
+            <p className="mb-4">
+              <strong>Hotel:</strong> Guards VIP but is way more skilled in PVP.
+            </p>
+          </>
+        )}
+
+        {/* STFO L5+ */}
+        {(clearance >= 5) && (
+          <>
+            <h3 className="text-2xl font-semibold mt-2">Team Accessible at L5+</h3>
+            <p className="mb-4">
+              <strong>STFO "Elite enforcers":</strong> A group from ████, similar to RESH-1 but in SD.
+            </p>
+          </>
+        )}
+      </section>
+
+      {/* Personnel - only L4+ can see files, L3 sees access denied */}
+      <section className="mb-10">
+        <h2 className="text-3xl font-bold mb-3 border-b border-white/40 pb-1">SD Personnel</h2>
+        {clearance >= 4 ? (
+          <ul className="list-disc list-inside max-w-prose space-y-2">
+            {/* Example personnel, add links and details here */}
+            <li>
+              <a href="https://docs.google.com/document/d/19y8PjZXeLRLeM5YRb2OrC5P0a-y_LOkVk4Qapm9vlTI/edit?usp=sharing" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-400">
+                Warrant Officer "Ratchet"
+              </a>
+            </li>
+            <li>
+              <a href="https://docs.google.com/document/d/1TNidYCG7qQ5wLJbqSQqMU0RDAHTgP7LvIxFIUXUkkBs/edit?usp=sharing" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-400">
+                Chinatsu
+              </a>
+            </li>
+            <li>
+              <a href="https://docs.google.com/document/d/1fNKU8Zk5LhS8fIYzQXKME80eI3Rm7agee9KIYOEhDys/edit?usp=sharing" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-400">
+                Aegis
+              </a>
+            </li>
+            {/* Add all other members similarly */}
+          </ul>
+        ) : (
+          <p className="italic text-red-500 font-semibold">Access Denied: Personnel files require Level 4 clearance or higher.</p>
+        )}
+      </section>
+
+      {/* SCP Search Section */}
+      <section className="mb-10">
+        <h2 className="text-3xl font-bold mb-3 border-b border-white/40 pb-1">SCP Search</h2>
+        <div className="flex flex-col md:flex-row md:items-center gap-4 max-w-xl">
+          <input
+            type="text"
+            placeholder="Search SCP (e.g. 173, SCP-096)"
+            value={scpSearch}
+            onChange={(e) => setScpSearch(e.target.value)}
+            className="flex-grow p-2 rounded bg-zinc-800 text-white"
+          />
+          <button
+            onClick={handleScpSearch}
+            className="px-5 py-2 bg-white text-black font-semibold rounded hover:bg-gray-300 transition"
+          >
+            Search
+          </button>
+        </div>
+        <div className="mt-4 max-w-3xl whitespace-pre-wrap bg-zinc-900 p-4 rounded min-h-[100px]">
+          {scpLoading && <p>Loading SCP info...</p>}
+          {scpError && <p className="text-red-500">{scpError}</p>}
+          {!scpLoading && !scpError && scpInfo && <p>{scpInfo}</p>}
+        </div>
+      </section>
     </div>
   );
 }

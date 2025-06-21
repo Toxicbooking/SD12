@@ -1,182 +1,304 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SCP Site-64 Security Department</title>
-  <style>
-    body {
-      font-family: 'Courier New', monospace;
-      background-color: #000;
-      color: #fff;
-      margin: 0;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>++SD MANAGEMENT TERMINAL++</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
-    .hidden {
-      display: none;
-    }
-
-    header, nav, section {
-      padding: 20px;
-    }
-
-    input, button {
-      font-family: inherit;
-      padding: 10px;
-      background-color: #111;
-      border: 1px solid #fff;
-      color: #fff;
-      margin-top: 10px;
-    }
-
-    nav button {
-      margin-right: 10px;
-    }
-
-    .content-section {
-      display: none;
-    }
-
-    .content-section.active {
-      display: block;
-    }
-
-    hr {
-      border-color: #fff;
-    }
-
-    .centered {
-      text-align: center;
-    }
-
-    #transition-screen {
-      font-size: 18px;
-      text-align: center;
-      animation: blink 1s steps(2, start) infinite;
-    }
-
-    @keyframes blink {
-      to {
-        visibility: hidden;
-      }
-    }
-
-    #user-info {
-      text-align: right;
-      padding: 10px;
-      font-size: 0.9em;
-      background-color: #111;
-    }
-  </style>
+  body {
+    background: black;
+    color: white;
+    font-family: 'Share Tech Mono', monospace;
+    padding: 20px;
+    user-select: none;
+  }
+  #terminal {
+    white-space: pre-wrap;
+    line-height: 1.3em;
+    max-width: 800px;
+    margin: auto;
+  }
+  .hidden {
+    display: none;
+  }
+  .input-line {
+    border-bottom: 1px solid white;
+    margin: 8px 0;
+    padding: 4px 8px;
+  }
+  button {
+    background: none;
+    border: 1px solid white;
+    color: white;
+    padding: 8px 16px;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 12px;
+  }
+  button:hover {
+    background: white;
+    color: black;
+  }
+  input[type="password"], input[type="text"] {
+    background: black;
+    border: 1px solid white;
+    color: white;
+    font-family: inherit;
+    font-size: 1em;
+    padding: 6px 10px;
+    width: 100%;
+    max-width: 300px;
+  }
+  .menu-option {
+    cursor: pointer;
+    color: #ccc;
+  }
+  .menu-option:hover {
+    color: white;
+    text-decoration: underline;
+  }
+  .passcode-dot {
+    font-size: 1.2em;
+    letter-spacing: 3px;
+  }
+  a {
+    color: #66f;
+  }
+</style>
 </head>
 <body>
 
-<!-- Clearance Page -->
-<div id="clearance-screen">
-  <header class="centered">
-    <h1>Welcome to SCP Site-64</h1>
-    <p><strong>Security Clearance and Codename Required</strong></p>
-  </header>
-  <section class="centered">
-    <label for="clearance">Clearance Level:</label><br />
-    <input type="text" id="clearance" placeholder="e.g., Level 4" /><br />
-    <label for="codename">Codename:</label><br />
-    <input type="text" id="codename" placeholder="e.g., Agent Shadow" /><br />
-    <button onclick="verifyClearance()">Verify</button>
-    <p id="error" style="color:red;"></p>
-  </section>
-</div>
-
-<!-- Transition Screen -->
-<div id="transition-screen" class="hidden">
-  <p>Processing Clearance...</p>
-</div>
-
-<!-- Main Site -->
-<div id="main-site" class="hidden">
-  <div id="user-info"></div>
-  <header>
-    <h1>SCP Site-64 Security Department</h1>
-    <hr />
-  </header>
-
-  <nav>
-    <button onclick="showSection('scps')">SCPs</button>
-    <button onclick="showSection('protocols')">Containment Protocols</button>
-    <button onclick="showSection('lore')">Site Lore</button>
-  </nav>
-
-  <!-- SCPs -->
-  <section id="scps" class="content-section active">
-    <h2>Common SCPs</h2>
-
-    <h3>SCP-173 – "The Sculpture"</h3>
-    <p><strong>Containment:</strong> Kept in a locked container. Two personnel must maintain eye contact at all times.</p>
-    <p><strong>Strength:</strong> Moves incredibly fast when not observed. Can snap necks instantly.</p>
-    <p><strong>Weakness:</strong> Cannot move when observed.</p>
-
-    <h3>SCP-096 – "The Shy Guy"</h3>
-    <p><strong>Containment:</strong> Must be contained in a sealed, soundproof cell. Cameras must not view its face.</p>
-    <p><strong>Strength:</strong> Near-invincible when enraged. Will pursue targets across the globe.</p>
-    <p><strong>Weakness:</strong> Only triggered when someone sees its face.</p>
-
-    <h3>SCP-457 – "Burning Man"</h3>
-    <p><strong>Containment:</strong> Housed in fire-retardant chamber with CO₂ suppression system.</p>
-    <p><strong>Strength:</strong> Consumes heat and grows stronger. Immune to fire.</p>
-    <p><strong>Weakness:</strong> Can be weakened with lack of fuel or oxygen.</p>
-
-    <h3>SCP-999 – "The Tickle Monster"</h3>
-    <p><strong>Containment:</strong> Allowed to roam under observation. Harmless.</p>
-    <p><strong>Strength:</strong> Emits euphoria, cures depression. Potential counter-agent to 682.</p>
-    <p><strong>Weakness:</strong> None currently known.</p>
-  </section>
-
-  <!-- Protocols -->
-  <section id="protocols" class="content-section">
-    <h2>Containment Protocols</h2>
-    <ul>
-      <li>All SCPs are to be secured in soundproof, reinforced cells.</li>
-      <li>Electronic surveillance must be installed in every containment chamber.</li>
-      <li>Entry requires dual biometric clearance from Level 4+ staff.</li>
-      <li>Mobile Task Forces (MTF) must be on standby at all times.</li>
-      <li>Weekly security audits are mandatory. Breaches trigger lockdowns within 3 seconds.</li>
-      <li>Failure to comply results in disciplinary action or demotion.</li>
-    </ul>
-  </section>
-
-  <!-- Lore -->
-  <section id="lore" class="content-section">
-    <h2>Site-64 Lore</h2>
-    <p>Located in Portland, Oregon, Site-64 is a mid-size secure containment and research site tasked with Pacific Northwest anomalies. Known for its proximity to active anomalous zones and frequent deployment of MTF Psi-7 ("Home Improvement").</p>
-    <p>Founded post-WWII, Site-64 originally operated under Project Bluebook. Its long history includes the containment of early Keter-class threats and housing O5 outposts.</p>
-  </section>
-</div>
+<div id="terminal"></div>
 
 <script>
-  function verifyClearance() {
-    const level = document.getElementById("clearance").value.trim().toLowerCase();
-    const codename = document.getElementById("codename").value.trim();
-    const validLevels = ["level 3", "level 4", "level 5", "3", "4", "5"];
+  // Data for agents and files
+  const agents = {
+    "RATCHET": "https://docs.google.com/document/d/19y8PjZXeLRLeM5YRb2OrC5P0a-y_LOkVk4Qapm9vlTI/edit",
+    "CHINATSU": "https://docs.google.com/document/u/0/d/1_EHJ-ut4quezxCJSCrMR4vzMZpouqms10R9xtZA5tUY/mobilebasic",
+    "AEGIS": "https://docs.google.com/document/d/1u4WypRconLkVQl2Kpyfo_-relGRMSm6kDn3RW5pOSqw/edit",
+    "ULGRIN": "https://docs.google.com/document/d/1ihlLNXQDcQJWf-G8_ok3o8gZuD7j6ADwehyaVd29atw/edit",
+    "BOBO": "https://docs.google.com/document/d/1Pe9M_jB5Ak95i-uoy9_3GvBNYkqAnEjyPIlboQxP7pE/edit",
+    "CAELUM": "blocked", // restricted, needs passcode
+    "BELL": "https://docs.google.com/document/d/1lhK-biGd6koGAMax01xtLYSweqGb8fm4fWI4RyZSdMM/edit",
+    "EAGLE": "https://docs.google.com/document/d/1lhK-biGd6koGAMax01xtLYSweqGb8fm4fWI4RyZSdMM/edit" // example reuse Bell's link for Eagle
+  };
 
-    if (validLevels.includes(level) && codename !== "") {
-      document.getElementById("clearance-screen").classList.add("hidden");
-      document.getElementById("transition-screen").classList.remove("hidden");
+  let terminal = document.getElementById("terminal");
+  let lineIndex = 0;
+  let currentStep = 0;
+  let inputCallback = null;
+  let passcode = "123456"; // passcode for blocked files (Caelum)
+  let lastSelectedAgent = "";
 
-      setTimeout(() => {
-        document.getElementById("transition-screen").classList.add("hidden");
-        document.getElementById("main-site").classList.remove("hidden");
-        document.getElementById("user-info").innerText = `Clearance: ${level.toUpperCase()} | Codename: ${codename}`;
-      }, 2500);
-    } else {
-      document.getElementById("error").innerText = "ACCESS DENIED: Valid clearance and codename required.";
+  // Text lines for initial steps:
+  const lines = [
+    "++SD MANAGEMENT TERMINAL++",
+    "———————————————————",
+    "WARNING:",
+    "YOU ARE ENTERING A RESTRICTED PROGRAM.",
+    "",
+    "PLEASE COMPLETE THE CAPTCHA GIVEN.",
+    "…",
+  ];
+
+  const captchaComplete = [
+    "CAPTCHA COMPLETED.",
+    "",
+    "PLEASE VERIFY AND ENTER YOUR CREDENTIALS.",
+    "…",
+    "STANDBY FOR VERIFICATION…",
+    "…",
+    "USER FOUND..",
+    "CHECKING ACCESS LEVEL..",
+    "…",
+    "ACCESS LEVEL UP TO CODE",
+    "VERIFYING…",
+    "…",
+    "AUTHORIZED. PROCEED.",
+    "———————————————————",
+    "WELCOME.",
+    "",
+    "SELECT CATEGORY",
+    ">PERSONNEL",
+    ">DATABASE",
+    ">DIPLOMACY",
+    ""
+  ];
+
+  const personnelList = [
+    ">RATCHET",
+    ">CHINATSU",
+    ">AEGIS",
+    ">ULGRIN",
+    ">BOBO",
+    ">CAELUM",
+    ">BELL",
+    ">EAGLE",
+    ">NEXT PAGE.."
+  ];
+
+  function printLine(text, delay=50, callback=null) {
+    // Simulate typing line with delay
+    let i = 0;
+    function typeChar() {
+      if (i < text.length) {
+        terminal.innerText += text[i];
+        i++;
+        setTimeout(typeChar, delay);
+      } else {
+        terminal.innerText += "\n";
+        if (callback) callback();
+      }
     }
+    typeChar();
   }
 
-  function showSection(id) {
-    const sections = document.querySelectorAll(".content-section");
-    sections.forEach(section => section.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
+  function printLines(arr, idx = 0, callback=null) {
+    if (idx >= arr.length) {
+      if(callback) callback();
+      return;
+    }
+    printLine(arr[idx], 30, () => printLines(arr, idx+1, callback));
   }
+
+  // Clear terminal
+  function clearTerminal() {
+    terminal.innerText = "";
+  }
+
+  // Display input prompt and accept user input
+  function promptInput(promptText, callback, isPassword = false) {
+    terminal.innerText += promptText;
+    inputCallback = callback;
+    let inputElement = document.createElement("input");
+    inputElement.type = isPassword ? "password" : "text";
+    inputElement.style.background = "black";
+    inputElement.style.color = "white";
+    inputElement.style.border = "1px solid white";
+    inputElement.style.fontFamily = "'Share Tech Mono', monospace";
+    inputElement.style.fontSize = "1em";
+    inputElement.style.width = "300px";
+    inputElement.autofocus = true;
+
+    terminal.appendChild(inputElement);
+    inputElement.focus();
+
+    inputElement.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        let val = inputElement.value.trim();
+        terminal.removeChild(inputElement);
+        terminal.innerText += val + "\n\n";
+        inputCallback = null;
+        callback(val);
+      }
+    });
+  }
+
+  function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  // Main flow controller
+  async function startTerminal() {
+    clearTerminal();
+    await printLines(lines);
+
+    // Show CAPTCHA "button"
+    const captchaBtn = document.createElement("button");
+    captchaBtn.innerText = "Complete CAPTCHA";
+    terminal.appendChild(captchaBtn);
+
+    captchaBtn.onclick = async () => {
+      captchaBtn.remove();
+      terminal.innerText += "\n";
+      await printLines(["…", "…", "…"]);
+      await printLines(captchaComplete);
+
+      showMainMenu();
+    };
+  }
+
+  // Show main menu (PERSONNEL, DATABASE, DIPLOMACY)
+  function showMainMenu() {
+    promptInput("> ", (choice) => {
+      const upperChoice = choice.toUpperCase();
+      if (upperChoice === "PERSONNEL") {
+        showPersonnelMenu();
+      } else if (upperChoice === "DATABASE") {
+        terminal.innerText += "DATABASE not implemented yet.\n\n";
+        showMainMenu();
+      } else if (upperChoice === "DIPLOMACY") {
+        terminal.innerText += "DIPLOMACY not implemented yet.\n\n";
+        showMainMenu();
+      } else {
+        terminal.innerText += "INVALID OPTION. TRY AGAIN.\n\n";
+        showMainMenu();
+      }
+    });
+  }
+
+  // Show Personnel Menu
+  function showPersonnelMenu() {
+    clearTerminal();
+    terminal.innerText += "PERSONNEL SELECTED\n\nPLEASE SELECT FILE\n";
+    personnelList.forEach(p => terminal.innerText += p + "\n");
+    terminal.innerText += "\n";
+
+    promptInput("> ", (selection) => {
+      const sel = selection.toUpperCase();
+      if (sel === "NEXT PAGE.." || sel === "NEXT PAGE") {
+        terminal.innerText += "\nNO MORE PAGES AVAILABLE.\n\n";
+        showPersonnelMenu();
+        return;
+      }
+      if (agents.hasOwnProperty(sel)) {
+        lastSelectedAgent = sel;
+        if (agents[sel] === "blocked") {
+          // Restricted file: ask for passcode
+          terminal.innerText += "\nERROR: FILE BLOCKED\n\nPLEASE ENTER PASSCODE\n";
+          promptInput("> ", (pass) => {
+            if (pass === passcode) {
+              terminal.innerText += "\nPASSCODE VERIFIED\nACCESS GRANTED\n\n";
+              showAgentFile(sel);
+            } else {
+              terminal.innerText += "\nPASSCODE DENIED\nACCESS DENIED\n\n";
+              showPersonnelMenu();
+            }
+          }, true);
+        } else {
+          // Open file directly
+          showAgentFile(sel);
+        }
+      } else {
+        terminal.innerText += "\nINVALID SELECTION. TRY AGAIN.\n\n";
+        showPersonnelMenu();
+      }
+    });
+  }
+
+  // Show agent file link or content
+  function showAgentFile(agent) {
+    clearTerminal();
+    terminal.innerText += `--- ${agent} FILE ---\n\n`;
+    const link = agents[agent];
+    if (link === "blocked") {
+      terminal.innerText += "[ERROR: FILE STILL BLOCKED]\n\n";
+      showPersonnelMenu();
+      return;
+    }
+    terminal.innerHTML += `Document link: <a href="${link}" target="_blank">${link}</a>\n\n`;
+    terminal.innerText += "Press ENTER to return to PERSONNEL MENU.\n\n";
+
+    promptInput("> ", () => {
+      showPersonnelMenu();
+    });
+  }
+
+  // Start terminal on load
+  window.onload = startTerminal;
 </script>
 
 </body>

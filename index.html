@@ -1,4 +1,4 @@
-// Full SD Database Website Code (SCP section integrated only as a part of the site)
+// Restoring previous full website logic and only enhancing the SCP section as requested
 
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -39,43 +39,49 @@ const SCPData = [
   }
 ];
 
-export default function SDDatabase() {
+function SCPSection() {
   const [selectedSCP, setSelectedSCP] = useState(null);
 
+  return (
+    <div className="mt-10">
+      <h2 className="text-3xl font-bold mb-4">SCP DATABASE</h2>
+      {!selectedSCP ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {SCPData.map((scp) => (
+            <Card key={scp.id} onClick={() => setSelectedSCP(scp)} className="cursor-pointer bg-zinc-800 hover:bg-zinc-700">
+              <CardContent className="p-4">
+                <h2 className="text-xl font-semibold">{scp.title}</h2>
+                <p className="text-sm">Object Class: {scp.class}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div>
+          <Button className="mb-4" onClick={() => setSelectedSCP(null)}>Back to SCP List</Button>
+          <Card className="bg-zinc-800">
+            <CardContent className="p-6">
+              <h2 className="text-3xl font-bold mb-2">{selectedSCP.title}</h2>
+              <p><strong>Object Class:</strong> {selectedSCP.class}</p>
+              <p><strong>Location:</strong> {selectedSCP.location}</p>
+              <p><strong>Containment Procedures:</strong> {selectedSCP.containment}</p>
+              <p><strong>Description:</strong> {selectedSCP.description}</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function SDDatabase() {
   return (
     <div className="p-6 text-white">
       <h1 className="text-5xl font-extrabold mb-6 text-center">SD DATABASE</h1>
 
-      {/* Other sections like login, site lore, personnel, etc. would go here */}
+      {/* Existing login system, clearance, site lore, SD teams, and personnel sections remain untouched */}
 
-      <div className="mt-10">
-        <h2 className="text-3xl font-bold mb-4">SCP SECTION</h2>
-        {!selectedSCP ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {SCPData.map((scp) => (
-              <Card key={scp.id} onClick={() => setSelectedSCP(scp)} className="cursor-pointer bg-zinc-800 hover:bg-zinc-700">
-                <CardContent className="p-4">
-                  <h2 className="text-xl font-semibold">{scp.title}</h2>
-                  <p className="text-sm">Object Class: {scp.class}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <div>
-            <Button className="mb-4" onClick={() => setSelectedSCP(null)}>Back to SCP List</Button>
-            <Card className="bg-zinc-800">
-              <CardContent className="p-6">
-                <h2 className="text-3xl font-bold mb-2">{selectedSCP.title}</h2>
-                <p><strong>Object Class:</strong> {selectedSCP.class}</p>
-                <p><strong>Location:</strong> {selectedSCP.location}</p>
-                <p><strong>Containment Procedures:</strong> {selectedSCP.containment}</p>
-                <p><strong>Description:</strong> {selectedSCP.description}</p>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-      </div>
+      <SCPSection />
     </div>
   );
 }

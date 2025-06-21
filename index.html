@@ -1,232 +1,327 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SD Database</title>
-  <style>
-    body {
-      margin: 0;
-      background-color: black;
-      color: white;
-      font-family: monospace, monospace;
-      line-height: 1.5;
-      max-width: 900px;
-      margin-left: auto;
-      margin-right: auto;
-      padding: 30px 20px;
-    }
-    h1, h2, h3 {
-      margin: 0 0 12px 0;
-      letter-spacing: 2px;
-    }
-    h1 {
-      font-size: 48px;
-      font-weight: bold;
-      border-bottom: 2px solid white;
-      padding-bottom: 12px;
-    }
-    h2 {
-      font-size: 32px;
-      border-bottom: 1.5px solid white;
-      padding-bottom: 8px;
-      margin-top: 40px;
-    }
-    h3 {
-      font-size: 24px;
-      margin-top: 25px;
-      margin-bottom: 8px;
-    }
-    p, ul {
-      font-size: 18px;
-      color: #ddd;
-    }
-    ul {
-      margin-left: 25px;
-    }
-    a {
-      color: #ccc;
-      text-decoration: underline;
-    }
-    a:hover {
-      color: white;
-    }
-    #login-container {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 20px;
-    }
-    #login-container input {
-      padding: 15px;
-      font-size: 22px;
-      width: 300px;
-      margin-bottom: 20px;
-      background-color: #111;
-      border: 2px solid white;
-      border-radius: 8px;
-      color: white;
-      outline: none;
-      text-align: center;
-    }
-    #login-container button {
-      padding: 15px 60px;
-      font-size: 24px;
-      font-weight: bold;
-      background-color: white;
-      color: black;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      user-select: none;
-    }
-    #header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 35px;
-    }
-    #header div {
-      font-size: 18px;
-      min-width: 250px;
-      text-align: right;
-      white-space: nowrap;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SD Database Terminal</title>
+<style>
+  body {
+    background-color: black;
+    color: white;
+    font-family: monospace, monospace;
+    margin: 0 auto;
+    max-width: 900px;
+    padding: 30px 20px;
+    user-select: none;
+  }
+  h1, h2, h3 {
+    margin-bottom: 12px;
+    letter-spacing: 2px;
+  }
+  h1 {
+    font-size: 48px;
+    border-bottom: 2px solid white;
+    padding-bottom: 12px;
+  }
+  h2 {
+    font-size: 32px;
+    border-bottom: 1.5px solid white;
+    padding-bottom: 8px;
+    margin-top: 40px;
+  }
+  p, ul {
+    font-size: 18px;
+    line-height: 1.5;
+    color: #ddd;
+  }
+  ul {
+    margin-left: 25px;
+    cursor: pointer;
+  }
+  ul li:hover {
+    color: #0f0;
+  }
+  a {
+    color: #ccc;
+    text-decoration: underline;
+  }
+  a:hover {
+    color: white;
+  }
+  #login-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  #login-container input {
+    padding: 15px;
+    font-size: 22px;
+    width: 300px;
+    margin-bottom: 20px;
+    background-color: #111;
+    border: 2px solid white;
+    border-radius: 8px;
+    color: white;
+    outline: none;
+    text-align: center;
+  }
+  #login-container button {
+    padding: 15px 60px;
+    font-size: 24px;
+    font-weight: bold;
+    background-color: white;
+    color: black;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+  #header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 35px;
+  }
+  #header div {
+    font-size: 18px;
+    min-width: 250px;
+    text-align: right;
+    white-space: nowrap;
+  }
+  #menu {
+    margin-top: 30px;
+    font-size: 22px;
+  }
+  #menu div {
+    cursor: pointer;
+    margin: 10px 0;
+    padding: 8px 12px;
+    border: 1px solid white;
+    border-radius: 6px;
+    max-width: 300px;
+    user-select: none;
+    transition: background-color 0.3s;
+  }
+  #menu div:hover {
+    background-color: #222;
+    color: #0f0;
+  }
+  #content {
+    margin-top: 40px;
+    font-size: 18px;
+    white-space: pre-wrap;
+    max-width: 900px;
+  }
+  #personnel-list li {
+    margin: 6px 0;
+  }
+  #personnel-list li:hover {
+    color: #0f0;
+  }
+  #scp-search-container {
+    margin-top: 20px;
+  }
+  #scp-search-input {
+    font-size: 20px;
+    padding: 10px;
+    width: 200px;
+    border-radius: 6px;
+    border: 2px solid white;
+    background-color: #111;
+    color: white;
+    outline: none;
+  }
+  #scp-search-btn {
+    font-size: 20px;
+    padding: 10px 15px;
+    margin-left: 10px;
+    border-radius: 6px;
+    border: none;
+    background-color: white;
+    color: black;
+    cursor: pointer;
+    user-select: none;
+  }
+  #scp-result {
+    margin-top: 20px;
+    max-width: 850px;
+    background-color: #111;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #0f0;
+    white-space: normal;
+  }
+  .error {
+    color: red;
+    margin-top: 20px;
+  }
+</style>
 </head>
 <body>
 
-  <!-- Login form -->
-  <div id="login-container">
+<!-- LOGIN SCREEN -->
+<div id="login-container">
+  <h1>SD DATABASE</h1>
+  <input
+    type="text"
+    id="clearance-input"
+    placeholder="Enter Clearance Level (3, 4, or 5)"
+    maxlength="1"
+    pattern="[345]"
+    autocomplete="off"
+  />
+  <input
+    type="text"
+    id="codename-input"
+    placeholder="Enter Codename"
+    autocomplete="off"
+  />
+  <button id="login-button">LOGIN</button>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="main-content" style="display:none;">
+  <header id="header">
     <h1>SD DATABASE</h1>
-    <input
-      type="text"
-      id="clearance-input"
-      placeholder="Enter Clearance Level (3, 4, or 5)"
-      maxlength="1"
-      pattern="[345]"
-    />
-    <input
-      type="text"
-      id="codename-input"
-      placeholder="Enter Codename"
-    />
-    <button id="login-button">LOGIN</button>
+    <div id="user-info"></div>
+  </header>
+
+  <div id="menu">
+    <div data-section="lore">SD LORE</div>
+    <div data-section="teams">SD TEAMS</div>
+    <div data-section="personnel">PERSONNEL</div>
+    <div data-section="scpdb">SCP DATABASE</div>
   </div>
 
-  <!-- Main content, hidden initially -->
-  <div id="main-content" style="display:none;">
-
-    <header id="header">
-      <h1>SD DATABASE</h1>
-      <div id="user-info"></div>
-    </header>
-
-    <section id="lore-section">
-      <h2>SD Lore</h2>
-      <p>
-        The Security Department (SD) is a division of the SCP Foundation, consisting of agents tasked with guarding the Foundation's secret bases and containment facilities. Their job duties include preventing containment breaches (SCPs escaping from the site), keeping D-class personnel under control and forcing them to cooperate in laboratory experiments, and defending the site from external attacks by hostile forces (whether that be an enemy Group of Interest or something more anomalous).
-      </p>
-    </section>
-
-    <section id="teams-section">
-      <h2>SD Teams</h2>
-
-      <div id="teams-l3"></div>
-      <div id="teams-l4"></div>
-      <div id="teams-l5"></div>
-    </section>
-
-    <section id="personnel-section" style="display:none;">
-      <h2>SD Personnel</h2>
-      <ul>
-        <li><a href="https://docs.google.com/document/d/19y8PjZXeLRLeM5YRb2OrC5P0a-y_LOkVk4Qapm9vlTI/edit?usp=sharing" target="_blank">Warrant Officer "Ratchet"</a></li>
-        <li><a href="https://docs.google.com/document/d/1TNidYCG7qQ5wLJbqSQqMU0RDAHTgP7LvIxFIUXUkkBs/edit?usp=sharing" target="_blank">Chinatsu</a></li>
-        <li><a href="https://docs.google.com/document/d/1fNKU8Zk5LhS8fIYzQXKME80eI3Rm7agee9KIYOEhDys/edit" target="_blank">Aegis</a></li>
-        <li><a href="https://docs.google.com/document/d/1dQwQMj6c8bjreWdlK2y7C0zg1Obf8Iz-kL1O-ogw22g/edit?usp=sharing" target="_blank">Ulgrin</a></li>
-        <li><a href="https://docs.google.com/document/d/1kTlLTzDJTNJwjrM8HNwYj5ym-vBFG6UuvwwIt09Sc88/edit?usp=sharing" target="_blank">BOBO</a></li>
-        <li><a href="https://docs.google.com/document/d/1WhzA9yJcVwNOW5aa2QeH5dAn48IRxm2XuD_-1Q83V-4/edit?usp=sharing" target="_blank">Ziomal</a></li>
-        <li><a href="https://docs.google.com/document/d/1ux5b5K16cTIQWliSNCwoCO4HraCqr7CdW3TiUO2PPf8/edit?usp=sharing" target="_blank">Chrashium</a></li>
-      </ul>
-    </section>
-
-  </div>
+  <div id="content"></div>
+</div>
 
 <script>
-  const loginBtn = document.getElementById('login-button');
-  const clearanceInput = document.getElementById('clearance-input');
-  const codenameInput = document.getElementById('codename-input');
+  const loginContainer = document.getElementById("login-container");
+  const mainContent = document.getElementById("main-content");
+  const clearanceInput = document.getElementById("clearance-input");
+  const codenameInput = document.getElementById("codename-input");
+  const loginButton = document.getElementById("login-button");
+  const userInfoDiv = document.getElementById("user-info");
+  const menu = document.getElementById("menu");
+  const content = document.getElementById("content");
 
-  const loginContainer = document.getElementById('login-container');
-  const mainContent = document.getElementById('main-content');
-  const userInfoDiv = document.getElementById('user-info');
+  let clearance = 0;
+  let codename = "";
 
-  const teamsL3Div = document.getElementById('teams-l3');
-  const teamsL4Div = document.getElementById('teams-l4');
-  const teamsL5Div = document.getElementById('teams-l5');
-  const personnelSection = document.getElementById('personnel-section');
+  // Personnel data
+  const personnel = [
+    { name: "Ratchet", link: "https://docs.google.com/document/d/19y8PjZXeLRLeM5YRb2OrC5P0a-y_LOkVk4Qapm9vlTI/edit?usp=sharing" },
+    { name: "Chinatsu", link: "https://docs.google.com/document/d/1TNidYCG7qQ5wLJbqSQqMU0RDAHTgP7LvIxFIUXUkkBs/edit?usp=sharing" },
+    { name: "Aegis", link: "https://docs.google.com/document/d/1fNKU8Zk5LhS8fIYzQXKME80eI3Rm7agee9KIYOEhDys/edit" },
+    { name: "Ulgrin", link: "https://docs.google.com/document/d/1dQwQMj6c8bjreWdlK2y7C0zg1Obf8Iz-kL1O-ogw22g/edit?usp=sharing" },
+    { name: "BOBO", link: "https://docs.google.com/document/d/1kTlLTzDJTNJwjrM8HNwYj5ym-vBFG6UuvwwIt09Sc88/edit?usp=sharing" },
+    { name: "Ziomal", link: "https://docs.google.com/document/d/1WhzA9yJcVwNOW5aa2QeH5dAn48IRxm2XuD_-1Q83V-4/edit?usp=sharing" },
+    { name: "Chrashium", link: "https://docs.google.com/document/d/1ux5b5K16cTIQWliSNCwoCO4HraCqr7CdW3TiUO2PPf8/edit?usp=sharing" },
+    { name: "Trooper", link: "https://docs.google.com/document/u/0/d/1D4edfHHDRQGbtG2PHP26tiD9lmGliEpnXdhhs3Vbuqg/mobilebasic" }
+  ];
 
-  loginBtn.addEventListener('click', () => {
-    const clearanceVal = parseInt(clearanceInput.value.trim());
-    const codenameVal = codenameInput.value.trim();
+  // SD Teams descriptions and access
+  const teamsDescriptions = {
+    3: `
+Teams accessible at L3+ clearance:
 
-    if (![3,4,5].includes(clearanceVal)) {
+- Charlie: CDC and LCZ work.
+- Quebec: MCZ and HCZ checkpoints and patrols.
+- Xray: Guards AD checkpoint and VIPs.
+    `.trim(),
+
+    4: `
+Teams accessible at L4+ clearance:
+
+- Hotel: Guards VIP but is way more skilled in PVP.
+    `.trim(),
+
+    5: `
+Teams accessible at L5+ clearance:
+
+- STFO "Elite enforcers": A group from ████, similar to ████-1 but in SD.
+    `.trim()
+  };
+
+  // SD Lore text
+  const sdLoreText = `
+The Security Department (SD) is a division of the SCP Foundation, consisting of agents tasked with guarding the Foundation's secret bases and containment facilities. Their job duties include preventing containment breaches (SCPs escaping from the site), keeping D-class personnel under control and forcing them to cooperate in laboratory experiments, and defending the site from external attacks by hostile forces (whether that be an enemy Group of Interest or something more anomalous).
+  `.trim();
+
+  // Handle login
+  loginButton.addEventListener("click", () => {
+    const c = clearanceInput.value.trim();
+    const name = codenameInput.value.trim();
+
+    if (!["3","4","5"].includes(c)) {
       alert("Clearance must be 3, 4, or 5.");
       return;
     }
-    if (codenameVal === "") {
-      alert("Codename cannot be empty.");
+    if (!name) {
+      alert("Please enter your codename.");
       return;
     }
 
-    // Hide login, show main content
+    clearance = Number(c);
+    codename = name;
+
     loginContainer.style.display = "none";
     mainContent.style.display = "block";
+    userInfoDiv.textContent = `Clearance: L${clearance} | Codename: ${codename}`;
 
-    // Set user info
-    userInfoDiv.textContent = `Codename: ${codenameVal} | Clearance Level: ${clearanceVal}`;
+    showLore();
+  });
 
-    // Show teams based on clearance
-    teamsL3Div.innerHTML = "";
-    teamsL4Div.innerHTML = "";
-    teamsL5Div.innerHTML = "";
-
-    if (clearanceVal >= 3) {
-      teamsL3Div.innerHTML = `
-        <h3>Teams accessible at L3+</h3>
-        <ul>
-          <li><strong>Charlie:</strong> CDC and LCZ work.</li>
-          <li><strong>Quebec:</strong> MCZ and HCZ checkpoints and patrols.</li>
-          <li><strong>Xray:</strong> Guards AD checkpoint and VIPs.</li>
-        </ul>
-      `;
-    }
-    if (clearanceVal >= 4) {
-      teamsL4Div.innerHTML = `
-        <h3>Team accessible at L4+</h3>
-        <p><strong>Hotel:</strong> Guards VIP but is way more skilled in PVP.</p>
-      `;
-    }
-    if (clearanceVal >= 5) {
-      teamsL5Div.innerHTML = `
-        <h3>Team accessible at L5+</h3>
-        <p><strong>STFO "Elite enforcers":</strong> A group from ████, similar to ████-1 but in SD.</p>
-      `;
-    }
-
-    // Show personnel only if clearance 4 or higher
-    if (clearanceVal >= 4) {
-      personnelSection.style.display = "block";
-    } else {
-      personnelSection.style.display = "none";
+  // Menu click handler
+  menu.addEventListener("click", (e) => {
+    if (e.target.dataset.section) {
+      const section = e.target.dataset.section;
+      if(section === "lore") {
+        showLore();
+      } else if(section === "teams") {
+        showTeams();
+      } else if(section === "personnel") {
+        showPersonnel();
+      } else if(section === "scpdb") {
+        showSCPDatabase();
+      }
     }
   });
-</script>
 
-</body>
-</html>
+  function showLore() {
+    content.innerHTML = `<h2>SD Lore</h2><p>${sdLoreText}</p>`;
+  }
+
+  function showTeams() {
+    let text = "";
+    if (clearance >= 3) text += teamsDescriptions[3] + "\n\n";
+    if (clearance >= 4) text += teamsDescriptions[4] + "\n\n";
+    if (clearance >= 5) text += teamsDescriptions[5];
+    content.innerHTML = `<h2>SD Teams</h2><pre style="font-family: monospace; white-space: pre-wrap;">${text.trim()}</pre>`;
+  }
+
+  function showPersonnel() {
+    if (clearance < 4) {
+      content.innerHTML = `<h2>Personnel</h2><p style="color:red;">ACCESS DENIED: Clearance L4 or higher required.</p>`;
+      return;
+    }
+    // list personnel clickable
+    let html = "<h2>Personnel</h2><ul id='personnel-list'>";
+    personnel.forEach(p => {
+      html += `<li><a href="${p.link}" target="_blank" rel="noopener noreferrer">${p.name}</a></li>`;
+    });
+    html += "</ul>";
+    content.innerHTML = html;
+  }
+
+  function showSCPDatabase() {
+    content.innerHTML = `
+      <h2>SCP Database Search</h2>
+      <div id="scp-search-container">
+        <input type="

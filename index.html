@@ -8,320 +8,115 @@
   body {
     background-color: black;
     color: white;
-    font-family: monospace, monospace;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 30px 20px;
-    user-select: none;
+    font-family: monospace;
+    padding: 30px;
+    max-width: 800px;
+    margin: auto;
   }
-  h1, h2 {
-    margin-bottom: 12px;
-    letter-spacing: 2px;
+  #login-container, #main-content {
+    display: none;
   }
-  h1 {
-    font-size: 48px;
-    border-bottom: 2px solid white;
-    padding-bottom: 12px;
+  #login-container.active, #main-content.active {
+    display: block;
   }
-  h2 {
-    font-size: 32px;
-    border-bottom: 1.5px solid white;
-    padding-bottom: 8px;
-    margin-top: 40px;
-  }
-  p, ul {
-    font-size: 18px;
-    line-height: 1.5;
-    color: #ddd;
-  }
-  ul {
-    margin-left: 25px;
-    cursor: pointer;
-  }
-  ul li:hover {
-    color: #0f0;
-  }
-  a {
-    color: #ccc;
-    text-decoration: underline;
-  }
-  a:hover {
-    color: white;
-  }
-  #login-container {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-  }
-  #login-container input {
-    padding: 15px;
-    font-size: 22px;
-    width: 300px;
-    margin-bottom: 20px;
-    background-color: #111;
+  input, button {
+    font-size: 20px;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 6px;
     border: 2px solid white;
-    border-radius: 8px;
+    background: #111;
     color: white;
-    outline: none;
-    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
   }
-  #login-container button {
-    padding: 15px 60px;
-    font-size: 24px;
-    font-weight: bold;
-    background-color: white;
-    color: black;
-    border: none;
-    border-radius: 8px;
+  button {
     cursor: pointer;
-    user-select: none;
-  }
-  #header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 35px;
-  }
-  #header div {
-    font-size: 18px;
-    min-width: 250px;
-    text-align: right;
-    white-space: nowrap;
-  }
-  #menu {
-    margin-top: 30px;
-    font-size: 22px;
+    background: white;
+    color: black;
+    font-weight: bold;
+    border: none;
   }
   #menu div {
     cursor: pointer;
     margin: 10px 0;
-    padding: 8px 12px;
+    padding: 10px;
     border: 1px solid white;
     border-radius: 6px;
     max-width: 300px;
     user-select: none;
-    transition: background-color 0.3s;
   }
   #menu div:hover {
     background-color: #222;
     color: #0f0;
   }
-  #content {
-    margin-top: 40px;
-    font-size: 18px;
-    white-space: pre-wrap;
-    max-width: 900px;
-  }
-  #personnel-list li {
-    margin: 6px 0;
-  }
-  #personnel-list li:hover {
-    color: #0f0;
-  }
-  #scp-search-container {
-    margin-top: 20px;
-  }
-  #scp-search-input {
-    font-size: 20px;
-    padding: 10px;
-    width: 200px;
-    border-radius: 6px;
-    border: 2px solid white;
-    background-color: #111;
-    color: white;
-    outline: none;
-  }
-  #scp-search-btn {
-    font-size: 20px;
-    padding: 10px 15px;
-    margin-left: 10px;
-    border-radius: 6px;
-    border: none;
-    background-color: white;
-    color: black;
-    cursor: pointer;
-    user-select: none;
-  }
-  #scp-result {
-    margin-top: 20px;
-    max-width: 850px;
-    background-color: #111;
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid #0f0;
-    white-space: normal;
-  }
-  .error {
-    color: red;
-    margin-top: 20px;
-  }
 </style>
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
-<div id="login-container">
-  <h1>SD DATABASE</h1>
-  <input
-    type="text"
-    id="clearance-input"
-    placeholder="Enter Clearance Level (3, 4, or 5)"
-    maxlength="1"
-    autocomplete="off"
-  />
-  <input
-    type="text"
-    id="codename-input"
-    placeholder="Enter Codename"
-    autocomplete="off"
-  />
-  <button id="login-button">LOGIN</button>
-  <div id="login-error" class="error"></div>
+<div id="login-container" class="active">
+  <h1>SD DATABASE LOGIN</h1>
+  <input id="clearance" type="text" placeholder="Clearance Level (3, 4, or 5)" maxlength="1" />
+  <input id="codename" type="text" placeholder="Codename" />
+  <button id="login-btn">LOGIN</button>
+  <div id="login-error" style="color: red; margin-top:10px;"></div>
 </div>
 
-<!-- MAIN CONTENT -->
-<div id="main-content" style="display:none;">
-  <header id="header">
-    <h1>SD DATABASE</h1>
-    <div id="user-info"></div>
-  </header>
-
+<div id="main-content">
+  <h1>SD DATABASE</h1>
+  <div id="user-info"></div>
   <div id="menu">
     <div data-section="lore">SD LORE</div>
     <div data-section="teams">SD TEAMS</div>
-    <div data-section="personnel">PERSONNEL</div>
-    <div data-section="scpdb">SCP DATABASE</div>
   </div>
-
-  <div id="content"></div>
+  <div id="content" style="white-space: pre-wrap; margin-top:20px;"></div>
 </div>
 
 <script>
-  // Elements
   const loginContainer = document.getElementById("login-container");
   const mainContent = document.getElementById("main-content");
-  const clearanceInput = document.getElementById("clearance-input");
-  const codenameInput = document.getElementById("codename-input");
-  const loginButton = document.getElementById("login-button");
+  const clearanceInput = document.getElementById("clearance");
+  const codenameInput = document.getElementById("codename");
+  const loginBtn = document.getElementById("login-btn");
   const loginError = document.getElementById("login-error");
-  const userInfoDiv = document.getElementById("user-info");
+  const userInfo = document.getElementById("user-info");
   const menu = document.getElementById("menu");
   const content = document.getElementById("content");
 
-  // Data
-  const validClearances = ["3", "4", "5"];
-  let clearance = null;
-  let codename = "";
+  const validClearances = ['3', '4', '5'];
 
-  const personnel = [
-    { name: "Ratchet", link: "https://docs.google.com/document/d/19y8PjZXeLRLeM5YRb2OrC5P0a-y_LOkVk4Qapm9vlTI/edit?usp=sharing" },
-    { name: "Chinatsu", link: "https://docs.google.com/document/d/1TNidYCG7qQ5wLJbqSQqMU0RDAHTgP7LvIxFIUXUkkBs/edit?usp=sharing" },
-    { name: "Aegis", link: "https://docs.google.com/document/d/1fNKU8Zk5LhS8fIYzQXKME80eI3Rm7agee9KIYOEhDys/edit" },
-    { name: "Ulgrin", link: "https://docs.google.com/document/d/1dQwQMj6c8bjreWdlK2y7C0zg1Obf8Iz-kL1O-ogw22g/edit?usp=sharing" },
-    { name: "BOBO", link: "https://docs.google.com/document/d/1kTlLTzDJTNJwjrM8HNwYj5ym-vBFG6UuvwwIt09Sc88/edit?usp=sharing" },
-    { name: "Ziomal", link: "https://docs.google.com/document/d/1WhzA9yJcVwNOW5aa2QeH5dAn48IRxm2XuD_-1Q83V-4/edit?usp=sharing" },
-    { name: "Chrashium", link: "https://docs.google.com/document/d/1ux5b5K16cTIQWliSNCwoCO4HraCqr7CdW3TiUO2PPf8/edit?usp=sharing" },
-    { name: "Trooper", link: "https://docs.google.com/document/u/0/d/1D4edfHHDRQGbtG2PHP26tiD9lmGliEpnXdhhs3Vbuqg/mobilebasic" }
-  ];
-
-  const teamsDescriptions = {
-    3: `
-Teams accessible at L3+ clearance:
-
-- Charlie: CDC and LCZ work.
-- Quebec: MCZ and HCZ checkpoints and patrols.
-- Xray: Guards AD checkpoint and VIPs.
-    `.trim(),
-
-    4: `
-Teams accessible at L4+ clearance:
-
-- Hotel: Guards VIP but is way more skilled in PVP.
-    `.trim(),
-
-    5: `
-Teams accessible at L5+ clearance:
-
-- STFO "Elite enforcers": A group from ████, similar to ████-1 but in SD.
-    `.trim()
-  };
-
-  const sdLoreText = `
-The Security Department (SD) is a division of the SCP Foundation tasked with guarding and maintaining containment of SCPs. Members serve as guards, response teams, and enforcers.
-
-Their duties include patrols, checkpoint security, quick response to containment breaches, and protection of VIP personnel.
-  `.trim();
-
-  const scpDatabase = {
-    "173": "SCP-173 is a hostile statue that moves when not observed.",
-    "096": "SCP-096 is a humanoid that becomes extremely agitated when viewed.",
-    "049": "SCP-049 is a plague doctor that attempts to 'cure' people by turning them into zombies.",
-    "999": "SCP-999 is a friendly, gelatinous entity known as the 'Tickle Monster'."
-  };
-
-  // Login function
-  function doLogin() {
+  loginBtn.addEventListener("click", () => {
     loginError.textContent = "";
-    const inputClearance = clearanceInput.value.trim();
-    const inputCodename = codenameInput.value.trim();
+    const clearance = clearanceInput.value.trim();
+    const codename = codenameInput.value.trim();
 
-    if (!validClearances.includes(inputClearance)) {
+    if (!validClearances.includes(clearance)) {
       loginError.textContent = "Access Denied: Invalid Clearance Level.";
       return;
     }
-    if (!inputCodename) {
-      loginError.textContent = "Access Denied: Codename required.";
+    if (codename === "") {
+      loginError.textContent = "Access Denied: Codename Required.";
       return;
     }
 
-    clearance = inputClearance;
-    codename = inputCodename;
+    // Success: Hide login, show main content
+    loginContainer.classList.remove("active");
+    mainContent.classList.add("active");
+    userInfo.textContent = `User: ${codename} | Clearance: ${clearance}`;
+    content.textContent = "Welcome! Please select a menu option.";
+  });
 
-    // Hide login, show main
-    loginContainer.style.display = "none";
-    mainContent.style.display = "block";
+  menu.addEventListener("click", (e) => {
+    if (!e.target.dataset.section) return;
 
-    userInfoDiv.textContent = `User: ${codename} | Clearance Level: ${clearance}`;
-
-    // Show initial content as welcome
-    content.textContent = "Welcome to the SD Database. Select a section from the menu.";
-  }
-
-  loginButton.addEventListener("click", doLogin);
-
-  // Allow enter key to submit login
-  clearanceInput.addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
-  codenameInput.addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
-
-  // Menu navigation
-  menu.addEventListener("click", e => {
-    if (e.target.dataset.section) {
-      loadSection(e.target.dataset.section);
+    if (e.target.dataset.section === "lore") {
+      content.textContent = `Security Department (SD) is tasked with guarding SCP facilities and preventing containment breaches.`;
+    } else if (e.target.dataset.section === "teams") {
+      content.textContent = `Teams:\n- Charlie: CDC and LCZ work.\n- Quebec: MCZ and HCZ checkpoints.\n- Xray: AD checkpoint guards.`;
     }
   });
 
-  // Section content loader
-  function loadSection(section) {
-    content.innerHTML = ""; // Clear previous
+</script>
 
-    if (section === "lore") {
-      content.textContent = sdLoreText;
-    } else if (section === "teams") {
-      // Show teams based on clearance
-      let teamsText = "";
-      if (clearance >= 3) teamsText += teamsDescriptions[3] + "\n\n";
-      if (clearance >= 4) teamsText += teamsDescriptions[4] + "\n\n";
-      if (clearance >= 5) teamsText += teamsDescriptions[5];
-      content.textContent = teamsText.trim();
-    } else if (section === "personnel") {
-      // Show personnel list with links
-      const ul = document.createElement("ul");
-      ul.id = "personnel-list";
-      personnel.forEach(p => {
-        const li = document.createElement("li");
-        const a =
+</body>
+</html>

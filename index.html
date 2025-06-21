@@ -27,10 +27,7 @@
   #terminal-input {
     display: none;
   }
-  .hidden {
-    display: none;
-  }
-  input[type="password"], input[type="text"] {
+  input[type="password"], input[type="text"], input[type="number"] {
     background: black;
     border: 1px solid white;
     color: white;
@@ -51,9 +48,6 @@
   button:hover {
     background: white;
     color: black;
-  }
-  a {
-    color: #66f;
   }
 </style>
 </head>
@@ -82,14 +76,14 @@
   let inputCallback = null;
   let passcode = "123456";
   let lastSelectedAgent = "";
+  let clearanceLevel = 0;
+  let codename = "";
 
-  // Helper to append text to terminal output
   function appendOutput(text = "") {
     terminalOutput.innerText += text + "\n";
     terminalOutput.scrollTop = terminalOutput.scrollHeight;
   }
 
-  // Print lines with delay, returns a Promise to await
   function printLines(lines, delay=30) {
     return new Promise(resolve => {
       let i = 0;
@@ -106,20 +100,18 @@
     });
   }
 
-  // Clear terminal
   function clearTerminal() {
     terminalOutput.innerText = "";
     terminalInputContainer.innerHTML = "";
     terminalInputContainer.style.display = "none";
   }
 
-  // Show input box with prompt, handle enter key
-  function promptInput(promptText, callback, isPassword=false) {
+  function promptInput(promptText, callback, isPassword=false, inputType="text") {
     appendOutput(promptText);
     terminalInputContainer.innerHTML = "";
     terminalInputContainer.style.display = "block";
     const input = document.createElement("input");
-    input.type = isPassword ? "password" : "text";
+    input.type = isPassword ? "password" : inputType;
     input.autofocus = true;
     terminalInputContainer.appendChild(input);
     input.focus();
@@ -149,59 +141,20 @@
       "WARNING:",
       "YOU ARE ENTERING A RESTRICTED PROGRAM.",
       "",
-      "PLEASE COMPLETE THE CAPTCHA GIVEN.",
-      "…"
+      "PLEASE SELECT CATEGORY",
+      ">PERSONNEL",
+      ">DATABASE",
+      ">DIPLOMACY",
+      ""
     ]);
-
-    // Show CAPTCHA button separately
-    const captchaBtn = document.createElement("button");
-    captchaBtn.textContent = "Complete CAPTCHA";
-    terminalInputContainer.appendChild(captchaBtn);
-    terminalInputContainer.style.display = "block";
-
-    captchaBtn.onclick = async () => {
-      captchaBtn.disabled = true;
-      terminalInputContainer.style.display = "none";
-      appendOutput("\n…");
-      await new Promise(r => setTimeout(r, 600));
-      appendOutput("…");
-      await new Promise(r => setTimeout(r, 600));
-      appendOutput("…");
-      await new Promise(r => setTimeout(r, 600));
-
-      await printLines([
-        "CAPTCHA COMPLETED.",
-        "",
-        "PLEASE VERIFY AND ENTER YOUR CREDENTIALS.",
-        "…",
-        "STANDBY FOR VERIFICATION…",
-        "…",
-        "USER FOUND..",
-        "CHECKING ACCESS LEVEL..",
-        "…",
-        "ACCESS LEVEL UP TO CODE",
-        "VERIFYING…",
-        "…",
-        "AUTHORIZED. PROCEED.",
-        "———————————————————",
-        "WELCOME.",
-        "",
-        "SELECT CATEGORY",
-        ">PERSONNEL",
-        ">DATABASE",
-        ">DIPLOMACY",
-        ""
-      ]);
-      showMainMenu();
-    };
+    showMainMenu();
   }
 
-  // Main menu
   function showMainMenu(){
     promptInput("> ", (choice) => {
       const c = choice.toUpperCase();
       if(c === "PERSONNEL") {
-        showPersonnelMenu();
+        verifyPersonnel();
       } else if(c === "DATABASE"){
         appendOutput("DATABASE not implemented yet.\n");
         showMainMenu();
@@ -215,21 +168,62 @@
     });
   }
 
-  // Personnel menu
-  function showPersonnelMenu(){
+  // New simple verification before Personnel access
+  function verifyPersonnel(){
     clearTerminal();
     appendOutput("PERSONNEL SELECTED\n");
+    promptInput("ENTER CLEARANCE LEVEL (3, 4, 5):", (level) => {
+      const lvl = Number(level);
+      if([3,4,5].includes(lvl)){
+        clearanceLevel = lvl;
+        promptInput("ENTER CODENAME:", (name) => {
+          codename = name.toUpperCase();
+          clearTerminal();
+          appendOutput(`CLEARANCE LEVEL: ${clearanceLevel} | CODENAME: ${codename}\n`);
+          showPersonnelMenu();
+        });
+      } else {
+        appendOutput("\nACCESS DENIED: INVALID CLEARANCE LEVEL.\n");
+        setTimeout(() => {
+          startTerminal();
+        }, 1500);
+      }
+    }, false, "number");
+  }
+
+  function showPersonnelMenu(){
+    clearTerminal();
+    appendOutput(`CLEARANCE LEVEL: ${clearanceLevel} | CODENAME: ${codename}\n`);
     appendOutput("PLEASE SELECT FILE");
-    Object.keys(agents).forEach(agent => appendOutput(">" + agent));
+    Object.keys(agents).forEach(agent => {
+      if(agent === "CAELUM" && clearanceLevel < 5){
+        appendOutput(">" + "CLASSIFIED");
+      } else {
+        appendOutput(">" + agent);
+      }
+    });
     appendOutput(">NEXT PAGE..\n");
 
     promptInput("> ", (sel) => {
-      const selection = sel.toUpperCase();
+      let selection = sel.toUpperCase();
       if(selection === "NEXT PAGE.." || selection === "NEXT PAGE"){
         appendOutput("\nNO MORE PAGES AVAILABLE.\n");
         showPersonnelMenu();
         return;
       }
+
+      // For censored names if clearance <5
+      if(clearanceLevel < 5 && selection === "CLASSIFIED"){
+        appendOutput("\nACCESS DENIED: CLEARANCE LEVEL TOO LOW.\n");
+        showPersonnelMenu();
+        return;
+      }
+
+      // Map back CLASSIFIED to CAELUM if clearance allows
+      if(selection === "CLASSIFIED"){
+        selection = "CAELUM";
+      }
+
       if(agents.hasOwnProperty(selection)){
         lastSelectedAgent = selection;
         if(agents[selection] === "blocked"){
@@ -253,9 +247,9 @@
     });
   }
 
-  // Show agent file (link)
   function showAgentFile(agent){
     clearTerminal();
+    appendOutput(`CLEARANCE LEVEL: ${clearanceLevel} | CODENAME: ${codename}\n`);
     appendOutput(`--- ${agent} FILE ---\n`);
     const link = agents[agent];
     if(link === "blocked"){

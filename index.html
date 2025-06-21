@@ -1,13 +1,11 @@
 import React, { useState } from "react";
 
 export default function SDDatabase() {
-  // States for login and user
   const [clearance, setClearance] = useState(null);
   const [codename, setCodename] = useState("");
   const [inputClearance, setInputClearance] = useState("");
   const [inputCodename, setInputCodename] = useState("");
 
-  // SCP Search states
   const [scpSearch, setScpSearch] = useState("");
   const [scpInfo, setScpInfo] = useState("");
   const [scpLoading, setScpLoading] = useState(false);
@@ -15,11 +13,11 @@ export default function SDDatabase() {
 
   function handleLogin() {
     const lvl = parseInt(inputClearance);
-    if ([3, 4, 5].includes(lvl) && inputCodename.trim() !== "") {
+    if ([3, 4, 5].includes(lvl) && inputCodename.trim()) {
       setClearance(lvl);
       setCodename(inputCodename.trim());
     } else {
-      alert("Invalid clearance (must be 3, 4, or 5) and non-empty codename.");
+      alert("Clearance must be 3, 4, or 5 and codename cannot be empty.");
     }
   }
 
@@ -33,69 +31,54 @@ export default function SDDatabase() {
       scpPage = "scp-" + scpPage;
     }
 
-    const wikiUrl = `https://scp-wiki.wikidot.com/${scpPage}`;
-
+    // WARNING: Due to CORS, direct fetch of SCP wiki will fail on normal browsers.
+    // For real deployment, a proxy server is required.
+    // Here, for demonstration, we just simulate a fetch.
     try {
-      // Replace this with your proxy URL that fetches the SCP Wiki page
-      const proxyUrl = `/api/proxy?url=${encodeURIComponent(wikiUrl)}`;
-
-      const res = await fetch(proxyUrl);
-      if (!res.ok) throw new Error("Failed to fetch SCP data.");
-
-      const text = await res.text();
-
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(text, "text/html");
-      const contentEl = doc.querySelector("#page-content");
-
-      if (!contentEl) throw new Error("SCP content not found.");
-
-      let contentText = contentEl.innerText.trim().slice(0, 2000);
-      setScpInfo(contentText);
+      // Simulated fetch delay
+      await new Promise((res) => setTimeout(res, 1500));
+      setScpInfo(
+        `Simulated SCP data for ${scpPage}:\n\n` +
+          "Containment Procedures: [Data unavailable]\n" +
+          "Description: [Data unavailable]\n\n(This demo does not fetch real SCP data due to CORS.)"
+      );
     } catch (err) {
-      setScpError("Error fetching SCP info: " + err.message);
+      setScpError("Failed to fetch SCP information.");
     } finally {
       setScpLoading(false);
     }
   }
 
   function handleScpSearch() {
-    if (scpSearch.trim() === "") {
-      alert("Enter SCP number or name to search.");
+    if (!scpSearch.trim()) {
+      alert("Enter an SCP number or name to search.");
       return;
     }
     fetchSCPInfo(scpSearch.trim());
   }
 
   if (!clearance) {
+    // Login Screen
     return (
       <div
         style={{
           height: "100vh",
-          backgroundColor: "black",
-          color: "white",
+          backgroundColor: "#000",
+          color: "#fff",
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
           fontFamily: "monospace",
           padding: 20,
+          textAlign: "center",
         }}
       >
-        <h1 style={{ fontSize: 64, marginBottom: 40 }}>SD DATABASE</h1>
+        <h1 style={{ fontSize: 72, marginBottom: 50, letterSpacing: 8 }}>SD DATABASE</h1>
+
         <input
-          style={{
-            marginBottom: 12,
-            padding: 10,
-            backgroundColor: "#111",
-            color: "white",
-            border: "1px solid white",
-            borderRadius: 4,
-            fontSize: 18,
-            textAlign: "center",
-            width: 250,
-          }}
-          placeholder="Enter Clearance Level (3,4,5)"
+          type="text"
+          placeholder="Enter Clearance Level (3, 4, 5)"
           value={inputClearance}
           onChange={(e) => {
             const val = e.target.value;
@@ -103,33 +86,51 @@ export default function SDDatabase() {
               setInputClearance(val);
             }
           }}
-        />
-        <input
           style={{
+            padding: 15,
             marginBottom: 20,
-            padding: 10,
-            backgroundColor: "#111",
-            color: "white",
-            border: "1px solid white",
-            borderRadius: 4,
-            fontSize: 18,
+            fontSize: 22,
+            width: 300,
             textAlign: "center",
-            width: 250,
+            backgroundColor: "#111",
+            border: "2px solid #fff",
+            borderRadius: 8,
+            color: "#fff",
+            outline: "none",
           }}
+        />
+
+        <input
+          type="text"
           placeholder="Enter Codename"
           value={inputCodename}
           onChange={(e) => setInputCodename(e.target.value)}
+          style={{
+            padding: 15,
+            marginBottom: 30,
+            fontSize: 22,
+            width: 300,
+            textAlign: "center",
+            backgroundColor: "#111",
+            border: "2px solid #fff",
+            borderRadius: 8,
+            color: "#fff",
+            outline: "none",
+          }}
         />
+
         <button
           onClick={handleLogin}
           style={{
-            padding: "10px 40px",
-            fontSize: 18,
+            padding: "15px 60px",
+            fontSize: 24,
             fontWeight: "bold",
-            backgroundColor: "white",
-            color: "black",
-            borderRadius: 6,
+            backgroundColor: "#fff",
+            color: "#000",
+            border: "none",
+            borderRadius: 8,
             cursor: "pointer",
+            userSelect: "none",
           }}
         >
           LOGIN
@@ -138,63 +139,95 @@ export default function SDDatabase() {
     );
   }
 
-  // Main page after login
+  // Main Database Page
   return (
     <div
       style={{
-        backgroundColor: "black",
-        color: "white",
+        backgroundColor: "#000",
+        color: "#fff",
         minHeight: "100vh",
-        padding: 20,
+        padding: "30px 20px 60px 20px",
         fontFamily: "monospace",
         maxWidth: 900,
-        margin: "auto",
+        margin: "0 auto",
+        lineHeight: 1.5,
       }}
     >
       {/* Header */}
       <header
         style={{
+          borderBottom: "2px solid #fff",
+          paddingBottom: 15,
+          marginBottom: 35,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          borderBottom: "1px solid white",
-          paddingBottom: 12,
-          marginBottom: 30,
+          flexWrap: "wrap",
+          gap: 10,
         }}
       >
-        <h1 style={{ fontSize: 48, fontWeight: "bold", letterSpacing: 4 }}>
+        <h1
+          style={{
+            fontSize: 50,
+            fontWeight: "bold",
+            letterSpacing: 5,
+            flexGrow: 1,
+            minWidth: 250,
+          }}
+        >
           SD DATABASE
         </h1>
-        <div style={{ fontSize: 18 }}>
+        <div
+          style={{
+            fontSize: 18,
+            minWidth: 250,
+            textAlign: "right",
+            whiteSpace: "nowrap",
+          }}
+        >
           Codename: <strong>{codename}</strong> | Clearance Level: <strong>{clearance}</strong>
         </div>
       </header>
 
       {/* SD Lore */}
-      <section style={{ marginBottom: 40 }}>
-        <h2 style={{ fontSize: 28, borderBottom: "1px solid white", paddingBottom: 8 }}>
+      <section style={{ marginBottom: 50 }}>
+        <h2
+          style={{
+            fontSize: 32,
+            borderBottom: "1.5px solid #fff",
+            paddingBottom: 8,
+            marginBottom: 12,
+          }}
+        >
           SD Lore
         </h2>
-        <p style={{ maxWidth: 700, color: "#ddd", lineHeight: 1.5, marginTop: 12 }}>
+        <p style={{ maxWidth: 700, color: "#ddd", fontSize: 18 }}>
           The Security Department (SD) is a division of the SCP Foundation, consisting of agents
           tasked with guarding the Foundation's secret bases and containment facilities. Their job
-          duties include preventing containment breaches (SCPs escaping from the site), keeping D-class
-          personnel under control and forcing them to cooperate in laboratory experiments, and defending
-          the site from external attacks by hostile forces (whether that be an enemy Group of Interest
-          or something more anomalous).
+          duties include preventing containment breaches (SCPs escaping from the site), keeping
+          D-class personnel under control and forcing them to cooperate in laboratory experiments,
+          and defending the site from external attacks by hostile forces (whether that be an enemy
+          Group of Interest or something more anomalous).
         </p>
       </section>
 
       {/* SD Teams */}
-      <section style={{ marginBottom: 40 }}>
-        <h2 style={{ fontSize: 28, borderBottom: "1px solid white", paddingBottom: 8 }}>
+      <section style={{ marginBottom: 50 }}>
+        <h2
+          style={{
+            fontSize: 32,
+            borderBottom: "1.5px solid #fff",
+            paddingBottom: 8,
+            marginBottom: 20,
+          }}
+        >
           SD Teams
         </h2>
 
         {clearance >= 3 && (
           <>
-            <h3 style={{ fontSize: 22, marginTop: 16 }}>Teams Accessible at L3+</h3>
-            <ul style={{ marginLeft: 20, marginTop: 8, lineHeight: 1.4 }}>
+            <h3 style={{ fontSize: 24, marginBottom: 10 }}>Teams accessible at L3+</h3>
+            <ul style={{ marginLeft: 20, fontSize: 18 }}>
               <li>
                 <strong>Charlie:</strong> CDC and LCZ work.
               </li>
@@ -210,8 +243,8 @@ export default function SDDatabase() {
 
         {clearance >= 4 && (
           <>
-            <h3 style={{ fontSize: 22, marginTop: 16 }}>Team Accessible at L4+</h3>
-            <p style={{ marginTop: 8 }}>
+            <h3 style={{ fontSize: 24, marginTop: 20, marginBottom: 10 }}>Team accessible at L4+</h3>
+            <p style={{ fontSize: 18 }}>
               <strong>Hotel:</strong> Guards VIP but is way more skilled in PVP.
             </p>
           </>
@@ -219,21 +252,28 @@ export default function SDDatabase() {
 
         {clearance >= 5 && (
           <>
-            <h3 style={{ fontSize: 22, marginTop: 16 }}>Team Accessible at L5+</h3>
-            <p style={{ marginTop: 8 }}>
-              <strong>STFO "Elite enforcers":</strong> A group from ████, similar to RESH-1 but in SD.
+            <h3 style={{ fontSize: 24, marginTop: 20, marginBottom: 10 }}>Team accessible at L5+</h3>
+            <p style={{ fontSize: 18 }}>
+              <strong>STFO "Elite enforcers":</strong> A group from ████, similar to ████-1 but in SD.
             </p>
           </>
         )}
       </section>
 
-      {/* Personnel */}
-      <section style={{ marginBottom: 40 }}>
-        <h2 style={{ fontSize: 28, borderBottom: "1px solid white", paddingBottom: 8 }}>
+      {/* Personnel Section */}
+      <section style={{ marginBottom: 50 }}>
+        <h2
+          style={{
+            fontSize: 32,
+            borderBottom: "1.5px solid #fff",
+            paddingBottom: 8,
+            marginBottom: 20,
+          }}
+        >
           SD Personnel
         </h2>
         {clearance >= 4 ? (
-          <ul style={{ marginLeft: 20, lineHeight: 1.6, maxWidth: 700 }}>
+          <ul style={{ marginLeft: 20, fontSize: 18 }}>
             <li>
               <a
                 href="https://docs.google.com/document/d/19y8PjZXeLRLeM5YRb2OrC5P0a-y_LOkVk4Qapm9vlTI/edit?usp=sharing"
@@ -249,4 +289,61 @@ export default function SDDatabase() {
                 href="https://docs.google.com/document/d/1TNidYCG7qQ5wLJbqSQqMU0RDAHTgP7LvIxFIUXUkkBs/edit?usp=sharing"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: "#ccc", textDecoration: "underline
+                style={{ color: "#ccc", textDecoration: "underline" }}
+              >
+                Chinatsu
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://docs.google.com/document/d/1fNKU8Zk5LhS8fIYzQXKME80eI3Rm7agee9KIYOEhDys/edit"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "#ccc", textDecoration: "underline" }}
+              >
+                Aegis
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://docs.google.com/document/d/1dQwQMj6c8bjreWdlK2y7C0zg1Obf8Iz-kL1O-ogw22g/edit?usp=sharing"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "#ccc", textDecoration: "underline" }}
+              >
+                Ulgrin
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://docs.google.com/document/d/1kTlLTzDJTNJwjrM8HNwYj5ym-vBFG6UuvwwIt09Sc88/edit?usp=sharing"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "#ccc", textDecoration: "underline" }}
+              >
+                BOBO
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://docs.google.com/document/d/1WhzA9yJcVwNOW5aa2QeH5dAn48IRxm2XuD_-1Q83V-4/edit?usp=sharing"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "#ccc", textDecoration: "underline" }}
+              >
+                Ziomal
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://docs.google.com/document/d/1ux5b5K16cTIQWliSNCwoCO4HraCqr7CdW3TiUO2PPf8/edit?usp=sharing"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "#ccc", textDecoration: "underline" }}
+              >
+                Chrashium
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://docs.google.com/document/u/0/d/1D4edfHHDRQGbtG2PHP26tiD9lmGli

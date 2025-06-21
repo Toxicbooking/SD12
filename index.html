@@ -1,6 +1,4 @@
-// SD Database Website Code
-
-// All SCP pages removed; replacing with new structure inspired by provided SCP data website
+// Full SD Database Website Code (SCP section integrated only as a part of the site)
 
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,7 +11,7 @@ const SCPData = [
     class: "Euclid",
     location: "Site-19",
     containment: "Kept in a locked container at all times. Personnel must maintain direct eye contact when entering.",
-    description: "SCP-173 is a statue-like creature. It is extremely hostile and will attack by snapping the neck of its victims. It cannot move while within a direct line of sight.",
+    description: "SCP-173 is a statue-like creature. It is extremely hostile and will attack by snapping the neck of its victims. It cannot move while within a direct line of sight."
   },
   {
     id: "scp-096",
@@ -21,41 +19,63 @@ const SCPData = [
     class: "Euclid",
     location: "Site-██",
     containment: "Contained in a sealed, soundproof cell. Any visual records of SCP-096's face must be destroyed immediately.",
-    description: "SCP-096 is a humanoid creature. If any individual views SCP-096's face, it will enter an emotional distress state and hunt down the viewer.",
+    description: "SCP-096 is a humanoid creature. If any individual views SCP-096's face, it will enter an emotional distress state and hunt down the viewer."
   },
-  // Add more SCPs as needed
+  {
+    id: "scp-457",
+    title: "SCP-457",
+    class: "Euclid",
+    location: "Thermal Chamber - Site-64",
+    containment: "Secured in a heat-resistant cell with no flammable materials. Monitored remotely via thermal cameras.",
+    description: "SCP-457 is a sentient flame that grows in size and strength with fuel. It exhibits basic intelligence and aggression."
+  },
+  {
+    id: "scp-999",
+    title: "SCP-999",
+    class: "Safe",
+    location: "Site-19",
+    containment: "Housed in a standard containment cell with access to toys and treats. Staff interaction is encouraged.",
+    description: "SCP-999 is a gelatinous, friendly creature known for its euphoric and healing effects on those who touch it."
+  }
 ];
 
-export default function SCPSection() {
+export default function SDDatabase() {
   const [selectedSCP, setSelectedSCP] = useState(null);
 
-  if (selectedSCP) {
-    return (
-      <div className="p-4 text-white">
-        <Button onClick={() => setSelectedSCP(null)} className="mb-4">Back</Button>
-        <Card>
-          <CardContent>
-            <h2 className="text-xl font-bold">{selectedSCP.title}</h2>
-            <p><strong>Object Class:</strong> {selectedSCP.class}</p>
-            <p><strong>Location:</strong> {selectedSCP.location}</p>
-            <p><strong>Containment:</strong> {selectedSCP.containment}</p>
-            <p><strong>Description:</strong> {selectedSCP.description}</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 text-white">
-      {SCPData.map((scp) => (
-        <Card key={scp.id} onClick={() => setSelectedSCP(scp)} className="cursor-pointer hover:bg-gray-800">
-          <CardContent>
-            <h2 className="text-lg font-semibold">{scp.title}</h2>
-            <p>Object Class: {scp.class}</p>
-          </CardContent>
-        </Card>
-      ))}
+    <div className="p-6 text-white">
+      <h1 className="text-5xl font-extrabold mb-6 text-center">SD DATABASE</h1>
+
+      {/* Other sections like login, site lore, personnel, etc. would go here */}
+
+      <div className="mt-10">
+        <h2 className="text-3xl font-bold mb-4">SCP SECTION</h2>
+        {!selectedSCP ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {SCPData.map((scp) => (
+              <Card key={scp.id} onClick={() => setSelectedSCP(scp)} className="cursor-pointer bg-zinc-800 hover:bg-zinc-700">
+                <CardContent className="p-4">
+                  <h2 className="text-xl font-semibold">{scp.title}</h2>
+                  <p className="text-sm">Object Class: {scp.class}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div>
+            <Button className="mb-4" onClick={() => setSelectedSCP(null)}>Back to SCP List</Button>
+            <Card className="bg-zinc-800">
+              <CardContent className="p-6">
+                <h2 className="text-3xl font-bold mb-2">{selectedSCP.title}</h2>
+                <p><strong>Object Class:</strong> {selectedSCP.class}</p>
+                <p><strong>Location:</strong> {selectedSCP.location}</p>
+                <p><strong>Containment Procedures:</strong> {selectedSCP.containment}</p>
+                <p><strong>Description:</strong> {selectedSCP.description}</p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

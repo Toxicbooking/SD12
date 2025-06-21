@@ -69,6 +69,7 @@
     font-family: inherit;
     padding: 6px;
     width: 200px;
+    box-sizing: border-box;
   }
   button.submit {
     margin-top: 10px;
@@ -76,6 +77,22 @@
   #top-info {
     font-size: 0.9rem;
     margin-bottom: 15px;
+  }
+  .access-denied {
+    color: #f44336;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-top: 20px;
+  }
+  .redacted {
+    background: white;
+    color: white;
+    border-radius: 2px;
+    padding: 0 4px;
+    user-select: none;
+  }
+  ul {
+    padding-left: 20px;
   }
 </style>
 </head>
@@ -93,9 +110,9 @@
   <h2>Verify Clearance</h2>
   <form id="login-form">
     <label for="clearance">Clearance Level (3, 4, or 5):</label>
-    <input type="number" id="clearance" name="clearance" min="1" max="5" required />
+    <input type="number" id="clearance" name="clearance" min="3" max="5" required />
     <label for="codename">Codename:</label>
-    <input type="text" id="codename" name="codename" required />
+    <input type="text" id="codename" name="codename" autocomplete="off" required maxlength="20" />
     <button type="submit" class="submit">Verify</button>
   </form>
   <p id="login-error" style="color:#f44336; display:none;"></p>
@@ -106,6 +123,7 @@
   <button data-section="protocols">Containment Protocols</button>
   <button data-section="personnel">SD Personnel</button>
   <button data-section="sd-lore">SD Lore</button>
+  <button data-section="teams">SD Teams</button>
 </nav>
 
 <section id="content" style="max-width:900px; margin:auto;"></section>
@@ -125,7 +143,7 @@
   const agents = {
     "Ratchet": "https://docs.google.com/document/d/19y8PjZXeLRLeM5YRb2OrC5P0a-y_LOkVk4Qapm9vlTI/edit?usp=sharing",
     "Black Dawn": "https://docs.google.com/document/u/0/d/1_EHJ-ut4quezxCJSCrMR4vzMZpouqms10R9xtZA5tUY/mobilebasic",
-    "Caelum": "blocked",
+    "Caelum": "https://docs.google.com/document/d/1u4WypRconLkVQl2Kpyfo_-relGRMSm6kDn3RW5pOSqw/edit?usp=sharing",
     "Forge": "https://docs.google.com/document/d/1ihlLNXQDcQJWf-G8_ok3o8gZuD7j6ADwehyaVd29atw/edit?usp=sharing",
     "Bell": "https://docs.google.com/document/d/1Pe9M_jB5Ak95i-uoy9_3GvBNYkqAnEjyPIlboQxP7pE/edit?usp=sharing",
     "Toxic": "https://docs.google.com/document/d/1lhK-biGd6koGAMax01xtLYSweqGb8fm4fWI4RyZSdMM/edit?usp=sharing"
@@ -176,6 +194,30 @@
     <p>Their job duties include preventing containment breaches (SCPs escaping from the site), keeping D-class personnel under control and forcing them to cooperate in laboratory experiments, and defending the site from external attacks by hostile forces (whether that be an enemy Group of Interest or something more anomalous).</p>
   `;
 
+  // SD Teams descriptions
+  const sdTeamsData = {
+    charlie: {
+      name: "Team Charlie",
+      description: "Responsible for CDC (Containment and Decontamination Control) and LCZ (Low Containment Zone) work, handling low-risk SCP containment and site sanitation."
+    },
+    quebec: {
+      name: "Team Quebec",
+      description: "Operates checkpoints and patrols in the MCZ (Medium Containment Zone) and HCZ (High Containment Zone), maintaining security within these critical containment areas."
+    },
+    xray: {
+      name: "Team Xray",
+      description: "Guards the AD (Administrative) checkpoint and provides security for VIP personnel within the facility."
+    },
+    hotel: {
+      name: "Team Hotel",
+      description: "An elite unit overseeing advanced security operations and rapid response within the facility."
+    },
+    stfo: {
+      name: "STFO \"Elite Enforcers\"",
+      description: `STFO is a specialized task force within the Security Department, known for exceptional PvP skills and rapid tactical response. They are classified as <span class="redacted">████</span>-1, representing one of the most formidable units in the department, operating under strict confidentiality.`
+    }
+  };
+
   function updateTopInfo(){
     topInfo.textContent = `Clearance Level: ${clearanceLevel} | Codename: ${codename}`;
   }
@@ -219,6 +261,8 @@
       showPersonnel();
     } else if (section === "sd-lore"){
       content.innerHTML = sdLore;
+    } else if (section === "teams"){
+      showTeams();
     }
   }
 
@@ -235,20 +279,27 @@
   }
 
   function showPersonnel(){
+    if (clearanceLevel < 4){
+      content.innerHTML = `<p class="access-denied">ACCESS DENIED: Personnel files require clearance level 4 or higher.</p>`;
+      return;
+    }
     let html = "<h2>SD Personnel</h2><ul>";
     for(const [name, link] of Object.entries(agents)){
-      if (link === "blocked" && clearanceLevel < 5){
-        html += `<li>${name}: <span class="blocked">FILE CLASSIFIED</span></li>`;
-      } else if (link === "blocked"){
-        html += `<li>${name}: <span class="blocked">FILE BLOCKED</span></li>`;
-      } else {
-        html += `<li><a href="${link}" target="_blank" rel="noopener noreferrer">${name}</a></li>`;
-      }
+      html += `<li><a href="${link}" target="_blank" rel="noopener noreferrer">${name}</a></li>`;
     }
     html += "</ul>";
     content.innerHTML = html;
   }
-</script>
 
-</body>
-</html>
+  function showTeams(){
+    if (clearanceLevel < 3){
+      content.innerHTML = `<p class="access-denied">ACCESS DENIED: SD Teams require clearance level 3 or higher.</p>`;
+      return;
+    }
+    let html = "<h2>SD Teams</h2><ul>";
+    // Always show Charlie, Quebec, Xray for 3+
+    html += `<li><strong>${sdTeamsData.charlie.name}:</strong> ${sdTeamsData.charlie.description}</li>`;
+    html += `<li><strong>${sdTeamsData.quebec.name}:</strong> ${sdTeamsData.quebec.description}</li>`;
+    html += `<li><strong>${sdTeamsData.xray.name}:</strong> ${sdTeamsData.xray.description}</li>`;
+    if (clearanceLevel >= 4){
+      html += `<li><strong>${sdTeamsData.hotel.name

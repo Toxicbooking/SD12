@@ -7,25 +7,22 @@
   <style>
     body {
       font-family: 'Courier New', monospace;
-      background-color: #111;
+      background-color: #000;
       color: #0f0;
       margin: 0;
       padding: 0;
     }
-    header, nav, section {
-      padding: 20px;
-    }
-    #clearance-page, #main-site {
+    .hidden {
       display: none;
     }
-    .active {
-      display: block;
+    header, nav, section {
+      padding: 20px;
     }
     input, button {
       font-family: inherit;
       padding: 10px;
       margin-top: 10px;
-      background-color: #222;
+      background-color: #111;
       border: 1px solid #0f0;
       color: #0f0;
     }
@@ -46,10 +43,10 @@
 <body>
 
 <!-- Clearance Verification -->
-<div id="clearance-page" class="active">
+<div id="clearance-screen">
   <header>
     <h1>Welcome to SCP Site-64</h1>
-    <p>Security Clearance Required</p>
+    <p><strong>Security Clearance Required</strong></p>
   </header>
   <section>
     <label for="clearance">Enter Security Clearance Level:</label><br />
@@ -60,7 +57,7 @@
 </div>
 
 <!-- Main Site Content -->
-<div id="main-site">
+<div id="main-site" class="hidden">
   <header>
     <h1>SCP Site-64 Security Department</h1>
     <hr />
@@ -106,8 +103,8 @@
     const level = document.getElementById("clearance").value.trim().toLowerCase();
     const allowed = ["level 4", "4", "admin", "o5"];
     if (allowed.includes(level)) {
-      document.getElementById("clearance-page").classList.remove("active");
-      document.getElementById("main-site").classList.add("active");
+      document.getElementById("clearance-screen").classList.add("hidden");
+      document.getElementById("main-site").classList.remove("hidden");
     } else {
       document.getElementById("error").innerText = "ACCESS DENIED: Insufficient clearance.";
     }

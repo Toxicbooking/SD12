@@ -9,8 +9,8 @@
     background-color: black;
     color: white;
     font-family: monospace, monospace;
-    margin: 0 auto;
     max-width: 900px;
+    margin: 0 auto;
     padding: 30px 20px;
     user-select: none;
   }
@@ -181,6 +181,7 @@
     autocomplete="off"
   />
   <button id="login-button">LOGIN</button>
+  <div id="login-error" class="error"></div>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -201,19 +202,22 @@
 </div>
 
 <script>
+  // Elements
   const loginContainer = document.getElementById("login-container");
   const mainContent = document.getElementById("main-content");
   const clearanceInput = document.getElementById("clearance-input");
   const codenameInput = document.getElementById("codename-input");
   const loginButton = document.getElementById("login-button");
+  const loginError = document.getElementById("login-error");
   const userInfoDiv = document.getElementById("user-info");
   const menu = document.getElementById("menu");
   const content = document.getElementById("content");
 
-  let clearance = 0;
+  // Data
+  const validClearances = ["3", "4", "5"];
+  let clearance = null;
   let codename = "";
 
-  // Personnel data
   const personnel = [
     { name: "Ratchet", link: "https://docs.google.com/document/d/19y8PjZXeLRLeM5YRb2OrC5P0a-y_LOkVk4Qapm9vlTI/edit?usp=sharing" },
     { name: "Chinatsu", link: "https://docs.google.com/document/d/1TNidYCG7qQ5wLJbqSQqMU0RDAHTgP7LvIxFIUXUkkBs/edit?usp=sharing" },
@@ -225,7 +229,6 @@
     { name: "Trooper", link: "https://docs.google.com/document/u/0/d/1D4edfHHDRQGbtG2PHP26tiD9lmGliEpnXdhhs3Vbuqg/mobilebasic" }
   ];
 
-  // SD Teams descriptions and access
   const teamsDescriptions = {
     3: `
 Teams accessible at L3+ clearance:
@@ -248,6 +251,77 @@ Teams accessible at L5+ clearance:
     `.trim()
   };
 
-  // SD Lore text
   const sdLoreText = `
-The Security Department (SD) is a division of the SCP Foundation, consisting of agents tasked with guarding the Foundation's secret bases and containment facilities. Their job duties include preventing containment breaches (SCPs escaping from the
+The Security Department (SD) is a division of the SCP Foundation tasked with guarding and maintaining containment of SCPs. Members serve as guards, response teams, and enforcers.
+
+Their duties include patrols, checkpoint security, quick response to containment breaches, and protection of VIP personnel.
+  `.trim();
+
+  const scpDatabase = {
+    "173": "SCP-173 is a hostile statue that moves when not observed.",
+    "096": "SCP-096 is a humanoid that becomes extremely agitated when viewed.",
+    "049": "SCP-049 is a plague doctor that attempts to 'cure' people by turning them into zombies.",
+    "999": "SCP-999 is a friendly, gelatinous entity known as the 'Tickle Monster'."
+  };
+
+  // Login function
+  function doLogin() {
+    loginError.textContent = "";
+    const inputClearance = clearanceInput.value.trim();
+    const inputCodename = codenameInput.value.trim();
+
+    if (!validClearances.includes(inputClearance)) {
+      loginError.textContent = "Access Denied: Invalid Clearance Level.";
+      return;
+    }
+    if (!inputCodename) {
+      loginError.textContent = "Access Denied: Codename required.";
+      return;
+    }
+
+    clearance = inputClearance;
+    codename = inputCodename;
+
+    // Hide login, show main
+    loginContainer.style.display = "none";
+    mainContent.style.display = "block";
+
+    userInfoDiv.textContent = `User: ${codename} | Clearance Level: ${clearance}`;
+
+    // Show initial content as welcome
+    content.textContent = "Welcome to the SD Database. Select a section from the menu.";
+  }
+
+  loginButton.addEventListener("click", doLogin);
+
+  // Allow enter key to submit login
+  clearanceInput.addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
+  codenameInput.addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
+
+  // Menu navigation
+  menu.addEventListener("click", e => {
+    if (e.target.dataset.section) {
+      loadSection(e.target.dataset.section);
+    }
+  });
+
+  // Section content loader
+  function loadSection(section) {
+    content.innerHTML = ""; // Clear previous
+
+    if (section === "lore") {
+      content.textContent = sdLoreText;
+    } else if (section === "teams") {
+      // Show teams based on clearance
+      let teamsText = "";
+      if (clearance >= 3) teamsText += teamsDescriptions[3] + "\n\n";
+      if (clearance >= 4) teamsText += teamsDescriptions[4] + "\n\n";
+      if (clearance >= 5) teamsText += teamsDescriptions[5];
+      content.textContent = teamsText.trim();
+    } else if (section === "personnel") {
+      // Show personnel list with links
+      const ul = document.createElement("ul");
+      ul.id = "personnel-list";
+      personnel.forEach(p => {
+        const li = document.createElement("li");
+        const a =

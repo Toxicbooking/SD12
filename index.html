@@ -61,9 +61,11 @@
       }
     }
 
-    a {
-      color: #0cf;
-      text-decoration: underline;
+    #user-info {
+      text-align: right;
+      padding: 10px;
+      font-size: 0.9em;
+      background-color: #111;
     }
   </style>
 </head>
@@ -73,11 +75,13 @@
 <div id="clearance-screen">
   <header class="centered">
     <h1>Welcome to SCP Site-64</h1>
-    <p><strong>Security Clearance Required</strong></p>
+    <p><strong>Security Clearance and Codename Required</strong></p>
   </header>
   <section class="centered">
-    <label for="clearance">Enter Security Clearance Level:</label><br />
-    <input type="text" id="clearance" placeholder="e.g., Level 4" />
+    <label for="clearance">Clearance Level:</label><br />
+    <input type="text" id="clearance" placeholder="e.g., Level 4" /><br />
+    <label for="codename">Codename:</label><br />
+    <input type="text" id="codename" placeholder="e.g., Agent Shadow" /><br />
     <button onclick="verifyClearance()">Verify</button>
     <p id="error" style="color:red;"></p>
   </section>
@@ -90,6 +94,7 @@
 
 <!-- Main Site -->
 <div id="main-site" class="hidden">
+  <div id="user-info"></div>
   <header>
     <h1>SCP Site-64 Security Department</h1>
     <hr />
@@ -99,7 +104,6 @@
     <button onclick="showSection('scps')">SCPs</button>
     <button onclick="showSection('protocols')">Containment Protocols</button>
     <button onclick="showSection('lore')">Site Lore</button>
-    <button onclick="showSection('o5')">O5 Office</button>
   </nav>
 
   <!-- SCPs -->
@@ -146,31 +150,25 @@
     <p>Located in Portland, Oregon, Site-64 is a mid-size secure containment and research site tasked with Pacific Northwest anomalies. Known for its proximity to active anomalous zones and frequent deployment of MTF Psi-7 ("Home Improvement").</p>
     <p>Founded post-WWII, Site-64 originally operated under Project Bluebook. Its long history includes the containment of early Keter-class threats and housing O5 outposts.</p>
   </section>
-
-  <!-- O5 Office -->
-  <section id="o5" class="content-section">
-    <h2>O5 Council Access</h2>
-    <p>Accessing <a href="https://www.site64.site/o5-office" target="_blank">O5 Office</a>...</p>
-    <p><em>NOTICE:</em> Unauthorized access is monitored. You are being watched.</p>
-  </section>
 </div>
 
 <script>
   function verifyClearance() {
     const level = document.getElementById("clearance").value.trim().toLowerCase();
+    const codename = document.getElementById("codename").value.trim();
     const validLevels = ["level 3", "level 4", "level 5", "3", "4", "5"];
 
-    if (validLevels.includes(level)) {
+    if (validLevels.includes(level) && codename !== "") {
       document.getElementById("clearance-screen").classList.add("hidden");
       document.getElementById("transition-screen").classList.remove("hidden");
 
-      // Fake loading
       setTimeout(() => {
         document.getElementById("transition-screen").classList.add("hidden");
         document.getElementById("main-site").classList.remove("hidden");
+        document.getElementById("user-info").innerText = `Clearance: ${level.toUpperCase()} | Codename: ${codename}`;
       }, 2500);
     } else {
-      document.getElementById("error").innerText = "ACCESS DENIED: Level 3 or higher required.";
+      document.getElementById("error").innerText = "ACCESS DENIED: Valid clearance and codename required.";
     }
   }
 

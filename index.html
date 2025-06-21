@@ -2,17 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>SD Database Terminal</title>
 <style>
-  /* Basic resets and styles */
   body {
     background-color: black;
     color: white;
     font-family: monospace;
     margin: 0; padding: 0;
-    height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden;
   }
 
   /* LOGIN BOX */
@@ -26,24 +24,18 @@
     box-sizing: border-box;
     border-radius: 15px;
     box-shadow: 0 0 30px #aa0000;
-    user-select: none;
     text-align: center;
   }
   #login-container h1 {
-    font-size: 3.5em;
-    letter-spacing: 0.15em;
-    margin-bottom: 8px;
+    font-size: 3em;
   }
   #login-container h2 {
-    font-size: 2.2em;
+    font-size: 2em;
     color: #ff2222;
-    letter-spacing: 0.1em;
-    margin: 8px 0;
   }
   #login-container h3 {
-    font-size: 1.3em;
+    font-size: 1.2em;
     color: #ff5555;
-    margin: 8px 0 20px;
   }
   #login-container p {
     font-weight: bold;
@@ -51,116 +43,48 @@
   }
   #login-container p.warning {
     color: #ff4444;
-    border: 1px solid #ff4444;
+    background-color: #220000;
     padding: 10px;
     border-radius: 6px;
-    background-color: #330000;
-    margin-top: 20px;
   }
-  #login-container input {
-    font-size: 1.5em;
+  #login-container input,
+  #login-container button {
+    font-size: 1.2em;
+    margin-top: 10px;
     padding: 10px;
-    margin: 12px 0;
-    width: 100%;
+    width: 90%;
     border-radius: 8px;
     border: 2px solid #990000;
     background: #440000;
     color: white;
-    box-sizing: border-box;
   }
   #login-container button {
-    width: 100%;
-    font-size: 1.7em;
-    font-weight: bold;
     background-color: #bb0000;
-    color: white;
-    padding: 15px 0;
-    border: none;
-    border-radius: 10px;
     cursor: pointer;
-    box-shadow: 0 0 10px #ff4444;
-    margin-top: 20px;
   }
   #login-error {
-    margin-top: 10px;
     color: #ff6666;
     font-weight: bold;
-    min-height: 1.2em;
+    margin-top: 10px;
   }
 
   /* MAIN CONTENT */
   #main-content {
     display: none;
-    padding: 20px 30px;
-    box-sizing: border-box;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    padding: 20px;
   }
-
-  #user-info {
-    font-weight: bold;
-    font-size: 1.3em;
-    margin-bottom: 15px;
-    user-select: none;
-    color: #eee;
+  .section {
+    margin-bottom: 20px;
   }
-
-  #menu {
-    flex-grow: 1;
-    display: flex;
-    gap: 20px;
-    overflow-x: auto;
-  }
-
-  .section-column {
-    background-color: #111;
-    border: 1.5px solid #333;
-    border-radius: 8px;
-    flex: 1;
-    min-width: 250px;
-    padding: 15px;
-    overflow-y: auto;
-    user-select: none;
-  }
-  .section-column h2 {
-    border-bottom: 1px solid #444;
-    padding-bottom: 8px;
-    margin-bottom: 12px;
-    text-align: center;
+  h2 {
     color: #ccc;
-    user-select: text;
   }
   a {
     color: #0f0;
-    text-decoration: underline;
-    cursor: pointer;
   }
-  a:hover {
-    color: #afa;
-  }
-
-  /* Access denied message */
-  .access-denied {
-    color: #f44;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 30px;
-  }
-  /* SCP list style */
-  ul.scp-list {
-    list-style: none;
-    padding-left: 5px;
-  }
-  ul.scp-list li {
-    margin: 8px 0;
-  }
-
 </style>
 </head>
 <body>
-
 <div id="login-container">
   <h1>SCP FOUNDATION</h1>
   <h2>TOP SECRET</h2>
@@ -168,100 +92,69 @@
   <p>Clearance Level: <strong>3 - 5</strong></p>
   <p>Status: <strong>RESTRICTED</strong></p>
   <p class="warning">WARNING: UNAUTHORIZED ACCESS WILL BE TERMINATED.</p>
-
-  <input id="clearance" type="text" placeholder="Clearance Level (3, 4, or 5)" maxlength="1" autocomplete="off" />
-  <input id="codename" type="text" placeholder="Codename" autocomplete="off" />
+  <input id="clearance" type="text" placeholder="Clearance Level (3-5)" />
+  <input id="codename" type="text" placeholder="Codename" />
   <button id="login-btn">LOGIN</button>
   <div id="login-error"></div>
 </div>
 
 <div id="main-content">
-  <div id="user-info"></div>
-  <div id="menu">
-    <!-- SD Lore -->
-    <div id="lore-section" class="section-column">
-      <h2>SD LORE</h2>
-      <p>
-        The Security Department (SD) is a division of the SCP Foundation, consisting of agents tasked with guarding the Foundation's secret bases and containment facilities. Their job duties include preventing containment breaches (SCPs escaping from the site), keeping D-class personnel under control and forcing them to cooperate in laboratory experiments, and defending the site from external attacks by hostile forces (whether that be an enemy Group of Interest or something more anomalous).
-      </p>
-    </div>
-
-    <!-- SD Teams -->
-    <div id="teams-section" class="section-column">
-      <h2>SD TEAMS</h2>
-      <div id="teams-content"></div>
-    </div>
-
-    <!-- Personnel -->
-    <div id="personnel-section" class="section-column">
-      <h2>PERSONNEL</h2>
-      <div id="personnel-content"></div>
-    </div>
-
-    <!-- SCP List -->
-    <div id="scp-section" class="section-column">
-      <h2>SCPs</h2>
-      <ul class="scp-list" id="scp-list">
-        <li><a href="https://scp-wiki.wikidot.com/scp-173" target="_blank">SCP-173</a></li>
-        <li><a href="https://scp-wiki.wikidot.com/scp-096" target="_blank">SCP-096</a></li>
-        <li><a href="https://scp-wiki.wikidot.com/scp-457" target="_blank">SCP-457</a></li>
-        <li><a href="https://scp-wiki.wikidot.com/scp-049" target="_blank">SCP-049</a></li>
-        <li><a href="https://scp-wiki.wikidot.com/scp-999" target="_blank">SCP-999</a></li>
-      </ul>
-    </div>
+  <div class="section">
+    <h2>Welcome to the SD Database Terminal</h2>
+    <p id="user-info"></p>
+  </div>
+  <div class="section">
+    <h2>SD Lore</h2>
+    <p>The Security Department (SD) is a division of the SCP Foundation, responsible for guarding Foundation facilities and personnel from anomalous threats and external forces.</p>
+  </div>
+  <div class="section">
+    <h2>Teams</h2>
+    <ul>
+      <li><strong>Charlie</strong> - Clearance 3 - CDC and LCZ work</li>
+      <li><strong>Quebec</strong> - Clearance 3 - MCZ and HCZ checkpoint patrols</li>
+      <li><strong>Xray</strong> - Clearance 3 - VIP guards and checkpoints</li>
+      <li><strong>Hotel</strong> - Clearance 4 - Advanced PVP and VIP guard</li>
+      <li><strong>STFO</strong> - Clearance 5 - Elite strike team</li>
+    </ul>
+  </div>
+  <div class="section">
+    <h2>Personnel</h2>
+    <ul>
+      <li><a href="https://docs.google.com/document/d/19y8PjZXeLRLeM5YRb2OrC5P0a-y_LOkVk4Qapm9vlTI/edit" target="_blank">Ratchet</a></li>
+      <li><a href="https://docs.google.com/document/d/1_EHJ-ut4quezxCJSCrMR4vzMZpouqms10R9xtZA5tUY/mobilebasic" target="_blank">Black dawn</a></li>
+      <li><a href="https://docs.google.com/document/d/1u4WypRconLkVQl2Kpyfo_-relGRMSm6kDn3RW5pOSqw/edit" target="_blank">Caelum</a></li>
+      <li><a href="https://docs.google.com/document/d/1ihlLNXQDcQJWf-G8_ok3o8gZuD7j6ADwehyaVd29atw/edit" target="_blank">Forge</a></li>
+      <li><a href="https://docs.google.com/document/d/1Pe9M_jB5Ak95i-uoy9_3GvBNYkqAnEjyPIlboQxP7pE/edit" target="_blank">Bell</a></li>
+      <li><a href="https://docs.google.com/document/d/1lhK-biGd6koGAMax01xtLYSweqGb8fm4fWI4RyZSdMM/edit" target="_blank">Toxic</a></li>
+    </ul>
+  </div>
+  <div class="section">
+    <h2>SCPs</h2>
+    <ul>
+      <li><a href="https://scp-wiki.wikidot.com/scp-173" target="_blank">SCP-173</a></li>
+      <li><a href="https://scp-wiki.wikidot.com/scp-096" target="_blank">SCP-096</a></li>
+      <li><a href="https://scp-wiki.wikidot.com/scp-457" target="_blank">SCP-457</a></li>
+      <li><a href="https://scp-wiki.wikidot.com/scp-049" target="_blank">SCP-049</a></li>
+      <li><a href="https://scp-wiki.wikidot.com/scp-999" target="_blank">SCP-999</a></li>
+    </ul>
   </div>
 </div>
 
 <script>
-  const loginContainer = document.getElementById("login-container");
-  const mainContent = document.getElementById("main-content");
-  const clearanceInput = document.getElementById("clearance");
-  const codenameInput = document.getElementById("codename");
-  const loginBtn = document.getElementById("login-btn");
-  const loginError = document.getElementById("login-error");
-  const userInfo = document.getElementById("user-info");
-  const teamsContent = document.getElementById("teams-content");
-  const personnelContent = document.getElementById("personnel-content");
+  document.getElementById("login-btn").addEventListener("click", () => {
+    const clearance = parseInt(document.getElementById("clearance").value);
+    const codename = document.getElementById("codename").value.trim();
+    const errorEl = document.getElementById("login-error");
 
-  const personnelData = {
-    "Ratchet": "https://docs.google.com/document/d/19y8PjZXeLRLeM5YRb2OrC5P0a-y_LOkVk4Qapm9vlTI/edit",
-    "Black dawn": "https://docs.google.com/document/d/1_EHJ-ut4quezxCJSCrMR4vzMZpouqms10R9xtZA5tUY/mobilebasic",
-    "Caelum": "https://docs.google.com/document/d/1u4WypRconLkVQl2Kpyfo_-relGRMSm6kDn3RW5pOSqw/edit",
-    "Forge": "https://docs.google.com/document/d/1ihlLNXQDcQJWf-G8_ok3o8gZuD7j6ADwehyaVd29atw/edit",
-    "Bell": "https://docs.google.com/document/d/1Pe9M_jB5Ak95i-uoy9_3GvBNYkqAnEjyPIlboQxP7pE/edit",
-    "Toxic": "https://docs.google.com/document/d/1lhK-biGd6koGAMax01xtLYSweqGb8fm4fWI4RyZSdMM/edit"
-  };
-
-  const teamsData = {
-    "3": [
-      {name: "Charlie", desc: "CDC and LCZ work."},
-      {name: "Quebec", desc: "MCZ and HCZ checkpoints and patrols."},
-      {name: "Xray", desc: "Guards AD checkpoint and VIPs."}
-    ],
-    "4": [
-      {name: "Hotel", desc: "Guards VIP, more advanced PVP."}
-    ],
-    "5": [
-      {name: "STFO", desc: "Elite enforcers group from ████ (REDACTED). The best of SD."}
-    ]
-  };
-
-  function clearLoginError() {
-    loginError.textContent = "";
-  }
-
-  function displayTeams(clearance) {
-    let teamsHtml = "";
-    if (clearance >= 3) {
-      teamsData["3"].forEach(t => {
-        teamsHtml += `<strong>${t.name}</strong>: ${t.desc}<br/><br/>`;
-      });
+    if (![3, 4, 5].includes(clearance) || !codename) {
+      errorEl.textContent = "Invalid clearance or codename.";
+      return;
     }
-    if (clearance >= 4) {
-      teamsData["4"].forEach(t => {
-        teamsHtml += `<strong>${t.name}</strong>: ${t.desc}<br/><br/>`;
-      });
-    }
-    if (clearance >= 5) {
-      teamsData["5"].forEach(t => {
-        teamsHtml += `<
+
+    document.getElementById("login-container").style.display = "none";
+    document.getElementById("main-content").style.display = "block";
+    document.getElementById("user-info").textContent = `User: ${codename} | Clearance Level: ${clearance}`;
+  });
+</script>
+</body>
+</html>

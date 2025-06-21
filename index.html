@@ -1,235 +1,61 @@
-<!-- Fully updated SD Terminal HTML with fixed navigation for all sections -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SD Database Terminal</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-    body {
-      background: black;
-      color: white;
-      font-family: 'Share Tech Mono', monospace;
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden;
-    }
-    header {
-      text-align: center;
-      padding: 60px 20px 20px;
-      animation: fadeIn 2s ease-out;
-    }
-    #top-info {
-      font-size: 3rem;
-      font-weight: bold;
-      margin-bottom: 10px;
-      letter-spacing: 2px;
-    }
-    #login-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 70vh;
-      animation: fadeIn 2s ease-out;
-    }
-    #login-section h2 {
-      font-size: 2rem;
-      margin-bottom: 20px;
-    }
-    label, input {
-      font-size: 1.2rem;
-      margin-bottom: 10px;
-    }
-    input[type="text"] {
-      background: black;
-      border: 1px solid white;
-      color: white;
-      padding: 6px;
-      width: 220px;
-      text-transform: uppercase;
-    }
-    button {
-      background: none;
-      border: 1px solid white;
-      color: white;
-      padding: 8px 16px;
-      cursor: pointer;
-      font-size: 1rem;
-      margin-top: 10px;
-      transition: all 0.3s ease;
-    }
-    button:hover {
-      background: white;
-      color: black;
-    }
-    #login-error {
-      color: red;
-      margin-top: 10px;
-      display: none;
-    }
-    nav {
-      text-align: center;
-      margin-top: 20px;
-      animation: fadeIn 1s ease-in-out;
-    }
-    nav button {
-      margin: 0 10px;
-    }
-    section#content {
-      padding: 20px;
-      max-width: 900px;
-      margin: auto;
-      animation: fadeIn 1.5s ease-in-out;
-    }
-    h2 {
-      border-bottom: 1px solid white;
-      padding-bottom: 6px;
-    }
-    a {
-      color: lightblue;
-      text-decoration: underline;
-    }
-    .access-denied {
-      color: #f44336;
-      font-weight: bold;
-    }
-    .redacted {
-      background: white;
-      color: white;
-      border-radius: 2px;
-      padding: 0 4px;
-      user-select: none;
-    }
-    @keyframes fadeIn {
-      0% {opacity: 0; transform: translateY(-10px);}
-      100% {opacity: 1; transform: translateY(0);}
-    }
-  </style>
-</head>
-<body>
+// SD Database Website Code
 
-<header>
-  <div id="top-info">SD DATABASE</div>
-</header>
+// All SCP pages removed; replacing with new structure inspired by provided SCP data website
 
-<section id="login-section">
-  <h2>Verify Clearance</h2>
-  <form id="login-form">
-    <label for="clearance">Clearance Level (3, 4, or 5):</label>
-    <input type="text" id="clearance" maxlength="1" placeholder="3, 4, or 5" required />
-    <label for="codename">Codename:</label>
-    <input type="text" id="codename" maxlength="20" required />
-    <button type="submit">Verify</button>
-    <p id="login-error"></p>
-  </form>
-</section>
+import React, { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
-<nav id="main-menu" style="display:none;">
-  <button data-section="scp">SCPs</button>
-  <button data-section="protocols">Containment Protocols</button>
-  <button data-section="personnel">SD Personnel</button>
-  <button data-section="sd-lore">SD Lore</button>
-  <button data-section="teams">SD Teams</button>
-</nav>
+const SCPData = [
+  {
+    id: "scp-173",
+    title: "SCP-173",
+    class: "Euclid",
+    location: "Site-19",
+    containment: "Kept in a locked container at all times. Personnel must maintain direct eye contact when entering.",
+    description: "SCP-173 is a statue-like creature. It is extremely hostile and will attack by snapping the neck of its victims. It cannot move while within a direct line of sight.",
+  },
+  {
+    id: "scp-096",
+    title: "SCP-096",
+    class: "Euclid",
+    location: "Site-██",
+    containment: "Contained in a sealed, soundproof cell. Any visual records of SCP-096's face must be destroyed immediately.",
+    description: "SCP-096 is a humanoid creature. If any individual views SCP-096's face, it will enter an emotional distress state and hunt down the viewer.",
+  },
+  // Add more SCPs as needed
+];
 
-<section id="content"></section>
+export default function SCPSection() {
+  const [selectedSCP, setSelectedSCP] = useState(null);
 
-<script>
-  const loginForm = document.getElementById("login-form");
-  const loginError = document.getElementById("login-error");
-  const loginSection = document.getElementById("login-section");
-  const mainMenu = document.getElementById("main-menu");
-  const content = document.getElementById("content");
-  const topInfo = document.getElementById("top-info");
+  if (selectedSCP) {
+    return (
+      <div className="p-4 text-white">
+        <Button onClick={() => setSelectedSCP(null)} className="mb-4">Back</Button>
+        <Card>
+          <CardContent>
+            <h2 className="text-xl font-bold">{selectedSCP.title}</h2>
+            <p><strong>Object Class:</strong> {selectedSCP.class}</p>
+            <p><strong>Location:</strong> {selectedSCP.location}</p>
+            <p><strong>Containment:</strong> {selectedSCP.containment}</p>
+            <p><strong>Description:</strong> {selectedSCP.description}</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
-  let clearanceLevel = 0;
-  let codename = "";
-
-  const personnelLinks = {
-    "Ratchet": "https://docs.google.com/document/d/19y8PjZXeLRLeM5YRb2OrC5P0a-y_LOkVk4Qapm9vlTI/edit",
-    "Black Dawn": "https://docs.google.com/document/d/1_EHJ-ut4quezxCJSCrMR4vzMZpouqms10R9xtZA5tUY/edit",
-    "Caelum": "https://docs.google.com/document/d/1u4WypRconLkVQl2Kpyfo_-relGRMSm6kDn3RW5pOSqw/edit",
-    "Forge": "https://docs.google.com/document/d/1ihlLNXQDcQJWf-G8_ok3o8gZuD7j6ADwehyaVd29atw/edit",
-    "Bell": "https://docs.google.com/document/d/1Pe9M_jB5Ak95i-uoy9_3GvBNYkqAnEjyPIlboQxP7pE/edit",
-    "Toxic": "https://docs.google.com/document/d/1lhK-biGd6koGAMax01xtLYSweqGb8fm4fWI4RyZSdMM/edit",
-    "Chinatsu": "https://docs.google.com/document/d/1TNidYCG7qQ5wLJbqSQqMU0RDAHTgP7LvIxFIUXUkkBs/edit",
-    "Aegis": "https://docs.google.com/document/d/1fNKU8Zk5LhS8fIYzQXKME80eI3Rm7agee9KIYOEhDys/edit",
-    "Ulgrin": "https://docs.google.com/document/d/1dQwQMj6c8bjreWdlK2y7C0zg1Obf8Iz-kL1O-ogw22g/edit",
-    "BOBO": "https://docs.google.com/document/d/1kTlLTzDJTNJwjrM8HNwYj5ym-vBFG6UuvwwIt09Sc88/edit",
-    "Ziomal": "https://docs.google.com/document/d/1WhzA9yJcVwNOW5aa2QeH5dAn48IRxm2XuD_-1Q83V-4/edit",
-    "Chrashium": "https://docs.google.com/document/d/1ux5b5K16cTIQWliSNCwoCO4HraCqr7CdW3TiUO2PPf8/edit",
-    "Trooper": "https://docs.google.com/document/d/1D4edfHHDRQGbtG2PHP26tiD9lmGliEpnXdhhs3Vbuqg/edit"
-  };
-
-  loginForm.addEventListener("submit", e => {
-    e.preventDefault();
-    const level = document.getElementById("clearance").value.trim();
-    const name = document.getElementById("codename").value.trim();
-
-    if (!["3", "4", "5"].includes(level)) {
-      loginError.textContent = "Invalid Clearance. Must be 3, 4, or 5.";
-      loginError.style.display = "block";
-      return;
-    }
-
-    clearanceLevel = parseInt(level);
-    codename = name.toUpperCase();
-    topInfo.textContent = `Clearance Level: ${clearanceLevel} | Codename: ${codename}`;
-    loginSection.style.display = "none";
-    mainMenu.style.display = "block";
-    content.innerHTML = "";
-  });
-
-  document.querySelectorAll('nav button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const section = btn.getAttribute('data-section');
-      content.innerHTML = '';
-
-      if (section === 'personnel') {
-        if (clearanceLevel < 4) {
-          content.innerHTML = '<p class="access-denied">ACCESS DENIED: LEVEL 4 OR HIGHER REQUIRED</p>';
-          return;
-        }
-        content.innerHTML = '<h2>SD Personnel Files</h2>' +
-          Object.entries(personnelLinks).map(([name, url]) => `<p><a href="${url}" target="_blank">${name}</a></p>`).join('');
-
-      } else if (section === 'sd-lore') {
-        content.innerHTML = `<h2>SD Lore</h2>
-        <p>The Security Department (SD) is a division of the SCP Foundation, consisting of agents tasked with guarding the Foundation's secret bases and containment facilities. Their job duties include preventing containment breaches, keeping D-class personnel under control and forcing them to cooperate in experiments, and defending the site from external attacks by hostile forces or anomalous threats.</p>`;
-
-      } else if (section === 'scp') {
-        content.innerHTML = `<h2>Common SCP Files</h2>
-        <ul>
-          <li><strong>SCP-173</strong>: Must remain in direct sight. Containment relies on at least 3 personnel present. Weak to blinking.</li>
-          <li><strong>SCP-096</strong>: Avoid seeing the face. Containment involves facing walls and blindfolds. Strength: speed and rage. Weakness: no facial exposure.</li>
-          <li><strong>SCP-457</strong>: Fire entity. Contained in non-flammable environment. Weak to suppression foam. Strength: heat, growth via flammables.</li>
-          <li><strong>SCP-999</strong>: Harmless. Contained for research. Brings happiness. Strength: pacification. Weakness: none known.</li>
-        </ul>`;
-
-      } else if (section === 'protocols') {
-        content.innerHTML = `<h2>Enhanced Containment Protocols</h2>
-        <p>Protocols include multi-lock cell doors, surveillance AI, remote tranquilization, biometric scan systems, fail-safe turrets, and auto-seal quarantine in breach cases.</p>`;
-
-      } else if (section === 'teams') {
-        let teamHTML = `<h2>SD Teams</h2>`;
-        if (clearanceLevel >= 3) {
-          teamHTML += `<p><strong>Team Charlie</strong>: Handles CDC (Containment Duty Control) and LCZ operations. Responsible for interior patrols, escort, and incident response.</p>
-            <p><strong>Team Quebec</strong>: Assigned to MCZ and HCZ, monitoring key zones and checkpoint security. Conducts containment lockdowns.</p>
-            <p><strong>Team X-Ray</strong>: Provides security for Administrative checkpoints and protection of on-site VIPs.</p>`;
-        }
-        if (clearanceLevel >= 4) {
-          teamHTML += `<p><strong>Team Hotel</strong>: Elite VIP protection unit. Highly trained in precision combat and threat interception during breach conditions.</p>`;
-        }
-        if (clearanceLevel >= 5) {
-          teamHTML += `<p><strong>STFO "Elite Enforcers"</strong>: Former [REDACTED] Unit, now under SD. Specialists in rapid tactical deployment and anomaly suppression. Operate in high-risk environments, elite status.</p>`;
-        }
-        content.innerHTML = teamHTML;
-      }
-    });
-  });
-</script>
-
-</body>
-</html>
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 text-white">
+      {SCPData.map((scp) => (
+        <Card key={scp.id} onClick={() => setSelectedSCP(scp)} className="cursor-pointer hover:bg-gray-800">
+          <CardContent>
+            <h2 className="text-lg font-semibold">{scp.title}</h2>
+            <p>Object Class: {scp.class}</p>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
